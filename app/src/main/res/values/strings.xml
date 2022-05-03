@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Capstone</string>
+    <string name="Username">Username</string>
+    <string name="Password">Password</string>
+    <string name="LogIn">Log In</string>
+    <string name="Hello">Hello!</string>
+</resources>
