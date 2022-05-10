@@ -4,6 +4,11 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/activity_main.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/home.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/login.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/project_cell.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/project_item.xml" value="0.33" />
+        <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/project_item_v2.xml" value="0.5" />
       </map>
     </option>
   </component>

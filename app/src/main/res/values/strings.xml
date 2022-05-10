@@ -4,4 +4,8 @@
     <string name="Password">Password</string>
     <string name="LogIn">Log In</string>
     <string name="Hello">Hello!</string>
+    <string name="Project">Project</string>
+    <string name="Creator">Creator</string>
+    <string name="Members">Members</string>
+    <string name="Description">Description</string>/>
 </resources>
