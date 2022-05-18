@@ -69,7 +69,7 @@ public class Login extends AppCompatActivity {
                                     if (documentSnapshot.exists()) {
                                         String role = documentSnapshot.get("role").toString();
                                         String name = documentSnapshot.get("name").toString();
-                                        Intent intent = new Intent(getApplicationContext(), Home.class);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                         intent.putExtra("role", role);
                                         intent.putExtra("name", name);
                                         startActivity(intent);
