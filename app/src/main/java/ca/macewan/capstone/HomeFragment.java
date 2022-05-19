@@ -2,6 +2,7 @@ package ca.macewan.capstone;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +24,6 @@ import com.google.firebase.firestore.Query;
 
 import ca.macewan.capstone.adapter.RecyclerAdapter;
 
-
 public class HomeFragment extends Fragment {
     private TextView textViewRole, textViewName;
     private RecyclerView recyclerViewProject;
@@ -31,10 +31,23 @@ public class HomeFragment extends Fragment {
     private String role;
     private String name;
 
+    // Required empty public constructor
     public HomeFragment(String givenRole, String givenName) {
-        // Required empty public constructor
         role = givenRole;
         name = givenName;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    // This one was missing in your earlier code
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        return view;
     }
 
     @Override
@@ -61,5 +74,18 @@ public class HomeFragment extends Fragment {
         recyclerAdapter = new RecyclerAdapter(options);
         recyclerViewProject.setAdapter(recyclerAdapter);
         recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        recyclerAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        recyclerAdapter.stopListening();
     }
 }
