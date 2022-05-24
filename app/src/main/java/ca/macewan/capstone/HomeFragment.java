@@ -24,7 +24,7 @@ import com.google.firebase.firestore.Query;
 
 import ca.macewan.capstone.adapter.RecyclerAdapter;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements RecyclerAdapter.OnProjectListener{
     private TextView textViewRole, textViewName;
     private RecyclerView recyclerViewProject;
     private RecyclerAdapter recyclerAdapter;
@@ -74,8 +74,8 @@ public class HomeFragment extends Fragment {
         recyclerAdapter = new RecyclerAdapter(options);
         recyclerViewProject.setAdapter(recyclerAdapter);
         recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerAdapter.setOnProjectListener(this);
     }
-
 
     @Override
     public void onStart() {
@@ -87,5 +87,10 @@ public class HomeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         recyclerAdapter.stopListening();
+    }
+
+    @Override
+    public void onProjectClick(int position, String projectID) {
+        System.out.println(projectID);
     }
 }
