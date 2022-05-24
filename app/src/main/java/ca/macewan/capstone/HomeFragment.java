@@ -24,7 +24,7 @@ import com.google.firebase.firestore.Query;
 
 import ca.macewan.capstone.adapter.RecyclerAdapter;
 
-public class HomeFragment extends Fragment implements RecyclerAdapter.OnProjectListener{
+public class HomeFragment extends Fragment {
     private TextView textViewRole, textViewName;
     private RecyclerView recyclerViewProject;
     private RecyclerAdapter recyclerAdapter;
@@ -50,47 +50,47 @@ public class HomeFragment extends Fragment implements RecyclerAdapter.OnProjectL
         return view;
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        textViewRole = (TextView) getView().findViewById(R.id.textView_Role);
-        textViewName = (TextView) getView().findViewById(R.id.textView_Name);
-        recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
-        setUp();
-    }
-
-    public void setUp() {
-//        textViewRole = (TextView) findViewById(R.id.textView_Role);
-//        textViewName = (TextView) findViewById(R.id.textView_Name);
-//        recyclerViewProject = (RecyclerView) findViewById(R.id.recyclerView_Project);
-        textViewName.setText(name);
-        textViewRole.setText(role);
-
-        // This will display all the current projects in our database
-        Query query = FirebaseFirestore.getInstance().collection("Projects");
-        FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
-                .setQuery(query, Project.class)
-                .build();
-        recyclerAdapter = new RecyclerAdapter(options);
-        recyclerViewProject.setAdapter(recyclerAdapter);
-        recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerAdapter.setOnProjectListener(this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        recyclerAdapter.startListening();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        recyclerAdapter.stopListening();
-    }
-
-    @Override
-    public void onProjectClick(int position, String projectID) {
-        System.out.println(projectID);
-    }
+//    @Override
+//    public void onViewCreated(View view, Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//        textViewRole = (TextView) getView().findViewById(R.id.textView_Role);
+//        textViewName = (TextView) getView().findViewById(R.id.textView_Name);
+//        recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
+//        setUp();
+//    }
+//
+//    public void setUp() {
+////        textViewRole = (TextView) findViewById(R.id.textView_Role);
+////        textViewName = (TextView) findViewById(R.id.textView_Name);
+////        recyclerViewProject = (RecyclerView) findViewById(R.id.recyclerView_Project);
+//        textViewName.setText(name);
+//        textViewRole.setText(role);
+//
+//        // This will display all the current projects in our database
+//        Query query = FirebaseFirestore.getInstance().collection("Projects");
+//        FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
+//                .setQuery(query, Project.class)
+//                .build();
+//        recyclerAdapter = new RecyclerAdapter(options);
+//        recyclerViewProject.setAdapter(recyclerAdapter);
+//        recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
+//        recyclerAdapter.setOnProjectListener(this);
+//    }
+//
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        recyclerAdapter.startListening();
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        recyclerAdapter.stopListening();
+//    }
+//
+//    @Override
+//    public void onProjectClick(int position, String projectID) {
+//        System.out.println(projectID);
+//    }
 }

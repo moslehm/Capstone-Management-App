@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         role = getIntent().getExtras().getString("role");
         name = getIntent().getExtras().getString("name");
         homeFragment = new HomeFragment(role, name);
-        listFragment = new ListFragment();
+        listFragment = new ListFragment(role, name);
         settingsFragment = new SettingsFragment();
         selected = homeFragment;
 
