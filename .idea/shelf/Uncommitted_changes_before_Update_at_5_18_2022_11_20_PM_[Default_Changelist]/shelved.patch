@@ -1,0 +1,121 @@
+Index: app/src/main/java/ca/macewan/capstone/HomeFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ca.macewan.capstone;\r\n\r\nimport android.os.Bundle;\r\n\r\nimport androidx.fragment.app.Fragment;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.ImageView;\r\nimport android.widget.TextView;\r\n\r\nimport androidx.annotation.Nullable;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport com.firebase.ui.firestore.FirestoreRecyclerOptions;\r\nimport com.google.firebase.firestore.FirebaseFirestore;\r\nimport com.google.firebase.firestore.Query;\r\n\r\nimport ca.macewan.capstone.adapter.RecyclerAdapter;\r\n\r\n\r\npublic class HomeFragment extends Fragment {\r\n    private TextView textViewRole, textViewName;\r\n    private RecyclerView recyclerViewProject;\r\n    private RecyclerAdapter recyclerAdapter;\r\n    private String role;\r\n    private String name;\r\n\r\n    public HomeFragment(String givenRole, String givenName) {\r\n        // Required empty public constructor\r\n        role = givenRole;\r\n        name = givenName;\r\n    }\r\n\r\n    @Override\r\n    public void onViewCreated(View view, Bundle savedInstanceState) {\r\n        super.onViewCreated(view, savedInstanceState);\r\n        textViewRole = (TextView) getView().findViewById(R.id.textView_Role);\r\n        textViewName = (TextView) getView().findViewById(R.id.textView_Name);\r\n        recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);\r\n        setUp();\r\n    }\r\n\r\n    public void setUp() {\r\n//        textViewRole = (TextView) findViewById(R.id.textView_Role);\r\n//        textViewName = (TextView) findViewById(R.id.textView_Name);\r\n//        recyclerViewProject = (RecyclerView) findViewById(R.id.recyclerView_Project);\r\n        textViewName.setText(name);\r\n        textViewRole.setText(role);\r\n\r\n        // This will display all the current projects in our database\r\n        Query query = FirebaseFirestore.getInstance().collection(\"Projects\");\r\n        FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()\r\n                .setQuery(query, Project.class)\r\n                .build();\r\n        recyclerAdapter = new RecyclerAdapter(options);\r\n        recyclerViewProject.setAdapter(recyclerAdapter);\r\n        recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ca/macewan/capstone/HomeFragment.java	(revision f12dfb23062c27adca363aec009f315b807f3c29)
++++ app/src/main/java/ca/macewan/capstone/HomeFragment.java	(date 1652911120325)
+@@ -28,8 +28,8 @@
+     private TextView textViewRole, textViewName;
+     private RecyclerView recyclerViewProject;
+     private RecyclerAdapter recyclerAdapter;
+-    private String role;
+-    private String name;
++    private final String role;
++    private final String name;
+ 
+     public HomeFragment(String givenRole, String givenName) {
+         // Required empty public constructor
+@@ -61,5 +61,13 @@
+         recyclerAdapter = new RecyclerAdapter(options);
+         recyclerViewProject.setAdapter(recyclerAdapter);
+         recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
++        recyclerAdapter.startListening();
++    }
++
++
++    @Override
++    public void onStop() {
++        super.onStop();
++        recyclerAdapter.stopListening();
+     }
+ }
+\ No newline at end of file
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Default ignored files\r\n/shelf/\r\n/workspace.xml\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/.gitignore	(revision f12dfb23062c27adca363aec009f315b807f3c29)
++++ .idea/.gitignore	(date 1652910563171)
+@@ -1,3 +1,57 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
++# User-specific stuff
++.idea/**/workspace.xml
++.idea/**/tasks.xml
++.idea/**/usage.statistics.xml
++.idea/**/dictionaries
++.idea/**/shelf
++
++# Sensitive or high-churn files
++.idea/**/dataSources/
++.idea/**/dataSources.ids
++.idea/**/dataSources.local.xml
++.idea/**/sqlDataSources.xml
++.idea/**/dynamic.xml
++.idea/**/uiDesigner.xml
++.idea/**/dbnavigator.xml
++
++# Gradle
++.idea/**/gradle.xml
++.idea/**/libraries
++
++# Gradle and Maven with auto-import
++# When using Gradle or Maven with auto-import, you should exclude module files,
++# since they will be recreated, and may cause churn.  Uncomment if using
++# auto-import.
++# .idea/modules.xml
++# .idea/*.iml
++# .idea/modules
++
++# CMake
++cmake-build-*/
++
++# Mongo Explorer plugin
++.idea/**/mongoSettings.xml
++
++# File-based project format
++*.iws
++
++# IntelliJ
++out/
++
++# mpeltonen/sbt-idea plugin
++.idea_modules/
++
++# JIRA plugin
++atlassian-ide-plugin.xml
++
++# Cursive Clojure plugin
++.idea/replstate.xml
++
++# Crashlytics plugin (for Android Studio and IntelliJ)
++com_crashlytics_export_strings.xml
++crashlytics.properties
++crashlytics-build.properties
++fabric.properties
++
++# Editor-based Rest Client
++.idea/httpRequests
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/vcs.xml	(date 1652852620891)
++++ .idea/vcs.xml	(date 1652852620891)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file

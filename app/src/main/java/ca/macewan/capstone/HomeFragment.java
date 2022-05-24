@@ -53,16 +53,13 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        textViewRole = (TextView) getView().findViewById(R.id.textView_Role);
-        textViewName = (TextView) getView().findViewById(R.id.textView_Name);
-        recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
         setUp();
     }
 
     public void setUp() {
-//        textViewRole = (TextView) findViewById(R.id.textView_Role);
-//        textViewName = (TextView) findViewById(R.id.textView_Name);
-//        recyclerViewProject = (RecyclerView) findViewById(R.id.recyclerView_Project);
+        textViewRole = (TextView) getView().findViewById(R.id.textView_Role);
+        textViewName = (TextView) getView().findViewById(R.id.textView_Name);
+        recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
         textViewName.setText(name);
         textViewRole.setText(role);
 
@@ -72,6 +69,7 @@ public class HomeFragment extends Fragment {
                 .setQuery(query, Project.class)
                 .build();
         recyclerAdapter = new RecyclerAdapter(options);
+        recyclerViewProject.setItemAnimator(null);
         recyclerViewProject.setAdapter(recyclerAdapter);
         recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
