@@ -69,6 +69,7 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
         recyclerViewProject.setAdapter(recyclerAdapter);
         recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerAdapter.setOnProjectListener(this);
+        recyclerViewProject.setItemAnimator(null);
     }
 
     @Override
