@@ -48,5 +48,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-firestore:8.0.1'
     // FirebaseUI for Firebase Auth
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
+    implementation 'me.srodrigo:androidhintspinner:1.0.0'
+    implementation 'com.github.esafirm:android-image-picker:2.3.1'
 }
 

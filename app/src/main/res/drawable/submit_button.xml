@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Button is enabled -->
+    <item android:state_enabled="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+            <corners android:radius="3dp"/>
+            <stroke android:color="@color/dark_gray" android:width="2dp"/>
+        </shape>
+    </item>
+
+    <!-- Normal state -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+            <corners android:radius="3dp"/>
+            <stroke android:color="@color/lighter_gray" android:width="2dp" />
+        </shape>
+    </item>
+</selector>

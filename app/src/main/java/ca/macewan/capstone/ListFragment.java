@@ -4,12 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,6 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import ca.macewan.capstone.adapter.RecyclerAdapter;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,9 +39,18 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     private String name;
 
     public ListFragment(String givenRole, String givenName) {
+
+public class ListFragment extends Fragment {
+
+    public ListFragment() {
         // Required empty public constructor
         role = givenRole;
         name = givenName;
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -89,5 +104,22 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
         Intent intent = new Intent(getContext(), ProjectInfoActivity.class);
         intent.putExtra("projectID", projectID);
         startActivity(intent);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //inflate menu
+        inflater.inflate(R.menu.menu_options, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_add) {
+            Intent menuIntent = new Intent(getActivity(), ProposalCreationActivity.class);
+            startActivity(menuIntent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
