@@ -30,13 +30,10 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     private TextView textViewRole, textViewName;
     private RecyclerView recyclerViewProject;
     private RecyclerAdapter recyclerAdapter;
-    private String role;
-    private String name;
+    private User user;
 
-    public ListFragment(String givenRole, String givenName) {
-        // Required empty public constructor
-        role = givenRole;
-        name = givenName;
+    public ListFragment(User user) {
+        this.user = user;
     }
 
     @Override
@@ -64,8 +61,8 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
 //        textViewRole = (TextView) findViewById(R.id.textView_Role);
 //        textViewName = (TextView) findViewById(R.id.textView_Name);
 //        recyclerViewProject = (RecyclerView) findViewById(R.id.recyclerView_Project);
-        textViewName.setText(name);
-        textViewRole.setText(role);
+        textViewName.setText(user.name);
+        textViewRole.setText(user.role);
 
         // This will display all the current projects in our database
         Query query = FirebaseFirestore.getInstance().collection("Projects");

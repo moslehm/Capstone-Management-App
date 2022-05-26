@@ -19,13 +19,11 @@ public class HomeFragment extends Fragment {
     private TextView textViewRole, textViewName;
     private RecyclerView recyclerViewProject;
     private RecyclerAdapter recyclerAdapter;
-    private String role;
-    private String name;
+    private User user;
 
     // Required empty public constructor
-    public HomeFragment(String givenRole, String givenName) {
-        role = givenRole;
-        name = givenName;
+    public HomeFragment(User user) {
+        this.user = user;
     }
 
     @Override

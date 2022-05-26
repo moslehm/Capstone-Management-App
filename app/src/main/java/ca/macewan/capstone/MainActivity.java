@@ -1,6 +1,7 @@
 package ca.macewan.capstone;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -8,14 +9,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
-    String role = "";
-    String name = "";
+    User user;
     public HomeFragment homeFragment;
     public ListFragment listFragment;
     public SettingsFragment settingsFragment;
@@ -53,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setup(){
-        role = getIntent().getExtras().getString("role");
-        name = getIntent().getExtras().getString("name");
-        homeFragment = new HomeFragment(role, name);
-        listFragment = new ListFragment(role, name);
+        user = (User) getIntent().getSerializableExtra("user");
+
+        homeFragment = new HomeFragment(user);
+        listFragment = new ListFragment(user);
         settingsFragment = new SettingsFragment();
         selected = homeFragment;
 
