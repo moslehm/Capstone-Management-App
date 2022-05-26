@@ -25,5 +25,4 @@ public class Project {
     public List<DocumentReference> getMembers() {
         return members;
     }
-
 }
