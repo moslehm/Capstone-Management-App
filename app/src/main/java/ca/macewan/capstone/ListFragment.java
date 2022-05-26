@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,8 +23,6 @@ import com.google.firebase.firestore.Query;
 
 import ca.macewan.capstone.adapter.RecyclerAdapter;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * A simple {@link Fragment} subclass.
  * Use the  factory method to
@@ -39,14 +36,11 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     private String name;
 
     public ListFragment(String givenRole, String givenName) {
-
-public class ListFragment extends Fragment {
-
-    public ListFragment() {
         // Required empty public constructor
         role = givenRole;
         name = givenName;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

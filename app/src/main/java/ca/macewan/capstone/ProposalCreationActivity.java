@@ -41,13 +41,14 @@ import me.srodrigo.androidhintspinner.HintSpinner;
 
 
 public class ProposalCreationActivity extends AppCompatActivity {
-    ScrollView scrollViewMain;
     EditText editTextTitle, editTextDescription;
     String selectedSemester;
     String[] supervisors = {"supervisor1", "supervisor2", "supervisor3", "supervisor4"};
     boolean[] selectedSupervisors;
     ArrayList<Integer> supervisorList = new ArrayList<>();
     private EditText editTextSupervisors, editTextKeyword;
+    public AlertDialog alertDialogSupervisor;
+    private HorizontalScrollView scrollViewTags;
     private ChipGroup chipGroup;
     private ImageButton buttonAttachImage;
     HorizontalScrollView scrollViewImages;
@@ -64,8 +65,6 @@ public class ProposalCreationActivity extends AppCompatActivity {
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        scrollViewMain = findViewById(R.id.scrollViewMain);
-
         String[] semesters = {"Fall", "Winter", "Spring", "Summer"};
         Spinner semestersSpinner = (Spinner) findViewById(R.id.spinnerSemester);
         addSpinner(semestersSpinner, semesters, "Semesters");
@@ -77,7 +76,6 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     private void setupSubmitButton() {
-        buttonSubmit = (Button) findViewById(R.id.button2);
         editTextTitle = (EditText) findViewById(R.id.editTextTitle);
         editTextTitle.addTextChangedListener (new TextWatcher() {
             @Override
@@ -85,7 +83,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2){
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
                 checkRequiredFields();
             }
 
@@ -101,12 +99,19 @@ public class ProposalCreationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2){
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
                 checkRequiredFields();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+            }
+        });
+        buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
+        buttonSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
             }
         });
     }
@@ -119,9 +124,9 @@ public class ProposalCreationActivity extends AppCompatActivity {
         buttonSubmit.setEnabled(!titleEmpty && !descriptionEmpty && semesterChosen && supervisorsChosen);
     }
 
-    public boolean anySupervisorsSelected(){
-        for(boolean val : selectedSupervisors){
-            if(val)
+    public boolean anySupervisorsSelected() {
+        for (boolean val : selectedSupervisors) {
+            if (val)
                 return true;
         }
         return false;
@@ -134,6 +139,8 @@ public class ProposalCreationActivity extends AppCompatActivity {
         editTextSupervisors.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (alertDialogSupervisor != null && alertDialogSupervisor.isShowing()) return;
+
                 // Close keyboard if open
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -168,12 +175,12 @@ public class ProposalCreationActivity extends AppCompatActivity {
                         editTextSupervisors.setText(stringBuilder.toString());
                     }
                 });
-                builder.show();
+                alertDialogSupervisor = builder.show();
             }
         });
     }
 
-    private void addSpinner(Spinner spinner, String[] stringArray, String hint){
+    private void addSpinner(Spinner spinner, String[] stringArray, String hint) {
         HintSpinner<String> hintSpinner = new HintSpinner<String>(
                 spinner,
                 new HintAdapter<String>(this, hint, Arrays.asList(stringArray)),
@@ -186,7 +193,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                     }
                 });
         View spinnerOverlay = findViewById(R.id.spinner_overlay);
-        spinnerOverlay.setOnClickListener(new View.OnClickListener(){
+        spinnerOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 spinner.performClick();
@@ -196,9 +203,10 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     private void setupTagChips() {
-        this.editTextKeyword = (EditText) this.findViewById(R.id.editTextTags);
-        this.chipGroup = (ChipGroup) this.findViewById(R.id.chipGroup);
-        ImageButton buttonAdd = (ImageButton) this.findViewById(R.id.buttonAddTag);
+        scrollViewTags = (HorizontalScrollView) findViewById(R.id.scrollViewTags);
+        editTextKeyword = (EditText) findViewById(R.id.editTextTags);
+        chipGroup = (ChipGroup) findViewById(R.id.chipGroup);
+        ImageButton buttonAdd = (ImageButton) findViewById(R.id.buttonAddTag);
 
         editTextKeyword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -238,7 +246,6 @@ public class ProposalCreationActivity extends AppCompatActivity {
             // Create a Chip from Layout.
             Chip newChip = (Chip) inflater.inflate(R.layout.layout_entry_chip, this.chipGroup, false);
             newChip.setText(keyword);
-
             this.chipGroup.addView(newChip);
             newChip.setClickable(false);
             newChip.setOnCloseIconClickListener(new View.OnClickListener() {
@@ -248,6 +255,12 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 }
             });
             this.editTextKeyword.setText("");
+            scrollViewTags.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollViewTags.fullScroll(View.FOCUS_RIGHT);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -259,15 +272,15 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     private void setupImageAttachment() {
-        buttonAttachImage = (ImageButton)findViewById(R.id.buttonAttachImage);
-        buttonAttachImage.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
+        buttonAttachImage = (ImageButton) findViewById(R.id.buttonAttachImage);
+        buttonAttachImage.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 ImagePicker.create(ProposalCreationActivity.this).start();
             }
         });
-        ImageButton buttonAttachImage2 = (ImageButton)findViewById(R.id.buttonAttachImage2);
-        buttonAttachImage2.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
+        ImageButton buttonAttachImage2 = (ImageButton) findViewById(R.id.buttonAttachImage2);
+        buttonAttachImage2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 ImagePicker.create(ProposalCreationActivity.this).start();
             }
         });
