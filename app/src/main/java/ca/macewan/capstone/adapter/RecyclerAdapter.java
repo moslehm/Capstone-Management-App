@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import ca.macewan.capstone.Project;
 import ca.macewan.capstone.R;
@@ -23,9 +27,17 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
 
     @Override
     protected void onBindViewHolder(@NonNull ProjectViewHolder holder, int position, @NonNull Project model) {
-        holder.textViewProjectCreator.setText(model.getCreator());
+        model.getCreator().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    String creator = task.getResult().get("name") + " <" + task.getResult().get("email") + ">";
+                    holder.textViewProjectCreator.setText(creator);
+                }
+            }
+        });
         holder.textViewProjectName.setText(model.getName());
-        SharedMethods.displayItems(model.getMembers(), holder.textViewProjectMembers);
+        //SharedMethods.displayItems(model.getMembers(), holder.textViewProjectMembers);
         holder.textViewProjectDesc.setText(model.getDescription());
     }
 

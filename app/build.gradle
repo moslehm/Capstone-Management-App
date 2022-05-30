@@ -49,5 +49,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
     implementation 'me.srodrigo:androidhintspinner:1.0.0'
     implementation 'com.github.esafirm:android-image-picker:2.3.1'
+    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'com.github.onemandan:MaterialTextView:0.0.5'
 }
 
