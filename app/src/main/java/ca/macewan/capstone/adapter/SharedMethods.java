@@ -11,50 +11,27 @@ import com.google.firebase.firestore.DocumentReference;
 
 import java.util.List;
 
+import uk.co.onemandan.materialtextview.MaterialTextView;
+
 public class SharedMethods {
-    public static void displayItems (List<DocumentReference> itemList, TextView textView) {
-        textView.setText("");
+    public static void displayItems (List<DocumentReference> itemList, MaterialTextView textView) {
+        textView.setContentText("", null);
         for (DocumentReference documentReference : itemList) {
             documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     String info = task.getResult().get("name").toString()
                             + " <" + task.getResult().get("email").toString() + ">";
-                    String temp = textView.getText().toString();
+                    String temp = (String) textView.getContentText();
                     if (temp.equals("")) {
-                        textView.append(info);
-                        System.out.println("no newline");
+                        textView.setContentText(info, null);
                     }
                     else {
-                        textView.append("\n" + info);
-                        System.out.println("has newline");
+                        temp += ("\n" + info);
+                        textView.setContentText(temp, null);
                     }
                 }
             });
         }
-//        if (itemList.size() > 0) {
-//            for (int i = 0; i < itemList.size(); i++) {
-//                if (i == 0) {
-//                    itemList.get(i).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            String info = task.getResult().get("name").toString()
-//                                    + " <" + task.getResult().get("email").toString() + ">";
-//                            textView.append(info);
-//                        }
-//                    });
-//                }
-//                else {
-//                    itemList.get(i).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            String info = "\n" + task.getResult().get("name").toString()
-//                                    + " <" + task.getResult().get("email").toString() + ">";
-//                            textView.append(info);
-//                        }
-//                    });
-//                }
-//            }
-//        }
     }
 }

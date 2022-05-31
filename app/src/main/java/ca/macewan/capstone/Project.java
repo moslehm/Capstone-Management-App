@@ -7,7 +7,7 @@ import java.util.List;
 public class Project {
     private String name;
     private String description;
-    private String creator;
+    private DocumentReference creator;
     private List<DocumentReference> members;
 
     public String getName() {
@@ -18,7 +18,7 @@ public class Project {
         return description;
     }
 
-    public String getCreator() {
+    public DocumentReference getCreator() {
         return creator;
     }
 

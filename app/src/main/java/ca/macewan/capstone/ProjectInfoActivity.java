@@ -24,27 +24,30 @@ import java.util.List;
 import java.util.ArrayList;
 
 import ca.macewan.capstone.adapter.SharedMethods;
+import uk.co.onemandan.materialtextview.MaterialTextView;
 
 public class ProjectInfoActivity extends AppCompatActivity {
-    TextView title, creator, description, members, supervisors;
+//    TextView title, creator, description, members, supervisors;
     Button button_Join;
     FirebaseFirestore db;
     String projectID;
+    MaterialTextView materialTextView_Creator, materialTextView_Title, materialTextView_Supervisor,
+            materialTextView_Members, materialTextView_Descriptions;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.project_info);
+        setContentView(R.layout.activity_project_info);
         setUp();
     }
 
     private void setUp() {
-        title = findViewById(R.id.textView);
-        creator = findViewById(R.id.textView6);
-        supervisors = findViewById(R.id.textView8);
-        description = findViewById(R.id.textView10);
-        members = findViewById(R.id.textView12);
-        button_Join = findViewById(R.id.button2);
+        button_Join = findViewById(R.id.button_Join);
+        materialTextView_Creator = findViewById(R.id.textView_Creator);
+        materialTextView_Title = findViewById(R.id.textiew_Title);
+        materialTextView_Members = findViewById(R.id.textView_Members);
+        materialTextView_Supervisor = findViewById(R.id.textView_Supervisor);
+        materialTextView_Descriptions = findViewById(R.id.textView_Description);
         db = FirebaseFirestore.getInstance();
 
         projectID = getIntent().getExtras().getString("projectID");
@@ -53,83 +56,108 @@ public class ProjectInfoActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot documentSnapshot = task.getResult();
                 if (documentSnapshot.exists()) {
-                    title.setText(documentSnapshot.getString("name"));
-                    description.setText(documentSnapshot.getString("description"));
+                    String name = documentSnapshot.getString("name");
+                    materialTextView_Title.setContentText(documentSnapshot.getString("name"), null);
+                    materialTextView_Title.setLabelText("Title");
+                    materialTextView_Descriptions.setContentText(documentSnapshot.getString("description"), null);
+                    materialTextView_Creator.setLabelText("Creator");
+                    materialTextView_Descriptions.setLabelText("Description");
+                    materialTextView_Members.setLabelText("Member(s)");
+                    materialTextView_Supervisor.setLabelText("Supervisor(s)");
+                    button_Join.setText("Join");
 
                     // display members and handle a case where no one has joined yet
                     try {
-                        SharedMethods.displayItems((ArrayList<DocumentReference>) documentSnapshot.get("members"), members);
+                        SharedMethods.displayItems((ArrayList<DocumentReference>) documentSnapshot.get("members"), materialTextView_Members);
                     } catch (NullPointerException ex) {
-                        members.setText("");
+                        materialTextView_Members.setContentText("", null);
                     }
 
-                    String creatorEmail = documentSnapshot.getString("creator");
-                    db.collection("Users")
-                            .document(creatorEmail).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    String nameEmail = task.getResult().get("name") + " <" + creatorEmail + ">";
-                                    creator.setText(nameEmail);
+                    DocumentReference creatorRef = documentSnapshot.getDocumentReference("creator");
+                    creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                String creatorName = task.getResult().getString("name");
+                                String creatorEmail = task.getResult().getString("email");
+                                String creatorInfo = creatorName + " <" + creatorEmail + ">";
+                                materialTextView_Creator.setContentText(creatorInfo, null);
+                                // disable Join button if current user is the one who created the project
+                                if (creatorEmail.equals(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())) {
+                                    button_Join.setEnabled(false);
                                 }
-                            });
+                                else {
+                                    button_Join.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            List<DocumentReference> memberRefList = (List<DocumentReference>) documentSnapshot.get("members");
+                                            // prompt if user already joined the project
+                                            if (memberRefList.contains(db.collection("Users")
+                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString()))) {
+                                                new AlertDialog.Builder(ProjectInfoActivity.this)
+                                                        .setMessage("You already joined this project")
+                                                        .show();
+                                            } else {
+                                                new AlertDialog.Builder(ProjectInfoActivity.this)
+                                                        .setMessage("Join this project?")
+                                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                                db.collection("Projects").document(projectID)
+                                                                        .update("members",
+                                                                                FieldValue.arrayUnion(db.collection("Users")
+                                                                                        .document(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())));
+                                                                db.collection("Projects").document(projectID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                        DocumentSnapshot documentSnapshot = task.getResult();
+                                                                        if (documentSnapshot.exists()) {
+                                                                            try {
+                                                                                SharedMethods.displayItems((ArrayList<DocumentReference>) documentSnapshot.get("members"), materialTextView_Members);
+                                                                            } catch (NullPointerException ex) {
+                                                                                materialTextView_Members.setContentText("", null);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                        })
+                                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                            }
+                                                        })
+                                                        .show();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+
+                        }
+                    });
+
+//                    String creatorEmail = documentSnapshot.getString("creator");
+//                    db.collection("Users")
+//                            .document(creatorEmail).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                                    String nameEmail = task.getResult().get("name") + " <" + creatorEmail + ">";
+//                                    materialTextView_Creator.setContentText(nameEmail, null);
+//                                    // disable Join button if current user is the one who created the project
+//
+//                                }
+//                            });
 
                     // display supervisors and handle a case where none supervisor selected
                     try {
-                        SharedMethods.displayItems((List<DocumentReference>) documentSnapshot.get("supervisors"), supervisors);
+                        SharedMethods.displayItems((List<DocumentReference>) documentSnapshot.get("supervisors"), materialTextView_Supervisor);
                     } catch (NullPointerException ex) {
-                        supervisors.setText("");
+                        materialTextView_Supervisor.setContentText("", null);
+//                        supervisors.setText("");
                     }
 
-                    // disable Join button if current user is the one who created the project
-                    if (creatorEmail.equals(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())) {
-                        button_Join.setEnabled(false);
-                    }
-                    else {
-                        button_Join.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                List<DocumentReference> memberRefList = (List<DocumentReference>) documentSnapshot.get("members");
-                                // prompt if user already joined the project
-                                if (memberRefList.contains(db.collection("Users")
-                                        .document(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString()))) {
-                                    new AlertDialog.Builder(ProjectInfoActivity.this)
-                                            .setMessage("You already joined this project")
-                                            .show();
-                                } else {
-                                    new AlertDialog.Builder(ProjectInfoActivity.this)
-                                            .setMessage("Join this project?")
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    db.collection("Projects").document(projectID)
-                                                            .update("members",
-                                                                    FieldValue.arrayUnion(db.collection("Users")
-                                                                            .document(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())));
-                                                    db.collection("Users")
-                                                            .document(FirebaseAuth
-                                                                    .getInstance().getCurrentUser()
-                                                                    .getEmail().toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                            if (task.isSuccessful()) {
-                                                                String name = task.getResult().get("name").toString();
-                                                                members.append("\n" + name + " <"
-                                                                        + FirebaseAuth.getInstance().getCurrentUser().getEmail().toString() + ">");
-                                                            }
-                                                        }
-                                                    });
-                                                }
-                                            })
-                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                }
-                                            })
-                                            .show();
-                                }
-                            }
-                        });
-                    }
+
                 }
             }
         });
