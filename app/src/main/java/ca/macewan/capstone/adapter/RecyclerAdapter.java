@@ -38,7 +38,7 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
         });
         holder.textViewProjectName.setText(model.getName());
         //SharedMethods.displayItems(model.getMembers(), holder.textViewProjectMembers);
-        holder.textViewProjectDesc.setText(model.getDescription());
+//        holder.textViewProjectDesc.setText(model.getDescription());
     }
 
     public void setOnProjectListener(OnProjectListener onProjectListener) {
@@ -54,16 +54,16 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textViewProjectName;
-        TextView textViewProjectDesc;
+//        TextView textViewProjectDesc;
         TextView textViewProjectCreator;
-        TextView textViewProjectMembers;
+//        TextView textViewProjectMembers;
 
         public ProjectViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewProjectName = itemView.findViewById(R.id.textView_pName);
+            textViewProjectName = itemView.findViewById(R.id.textView_pTitle);
             textViewProjectCreator = itemView.findViewById(R.id.textView_pCreator);
-            textViewProjectMembers = itemView.findViewById(R.id.textView_pMembers);
-            textViewProjectDesc = itemView.findViewById(R.id.textView_pDescription);
+//            textViewProjectMembers = itemView.findViewById(R.id.textView_pMembers);
+//            textViewProjectDesc = itemView.findViewById(R.id.textView_pDescription);
             itemView.setOnClickListener(this);
         }
 
