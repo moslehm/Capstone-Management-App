@@ -176,6 +176,9 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     DocumentReference projectRef = task.getResult();
                                     projectRef.update("tags", tags);
+                                    if (linearLayoutImages.getChildCount() - 1 == 0) {
+                                        finish();
+                                    }
                                     uploadImages(projectRef);
                                 }
                             }
@@ -211,6 +214,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                                 for (Object object : objects) {
                                                     Uri uri = (Uri) object;
                                                     imagePaths.add(uri.toString());
+                                                    finish();
                                                 }
                                                 projectRef.update("imagePaths", imagePaths);
                                             }
