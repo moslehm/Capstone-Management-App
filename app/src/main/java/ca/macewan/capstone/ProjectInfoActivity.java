@@ -61,7 +61,6 @@ public class ProjectInfoActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot documentSnapshot = task.getResult();
                 if (documentSnapshot.exists()) {
-                    String name = documentSnapshot.getString("name");
                     materialTextView_Title.setContentText(documentSnapshot.getString("name"), null);
                     materialTextView_Title.setLabelText("Title");
                     materialTextView_Descriptions.setContentText(documentSnapshot.getString("description"), null);
@@ -72,19 +71,17 @@ public class ProjectInfoActivity extends AppCompatActivity {
                     button_Join.setText("Join");
 
                     List<DocumentReference> memberRefList = (ArrayList<DocumentReference>) documentSnapshot.get("members");
+                    boolean status = documentSnapshot.getBoolean("status");
+                    checkBoxStatusSetup(status);
+                    buttonJoinSetUp(documentSnapshot, memberRefList, status);
+                    buttonQuitSetup(memberRefList);
+
                     // display members and handle a case where no one has joined yet
                     try {
                         SharedMethods.displayItems(memberRefList, materialTextView_Members);
                     } catch (NullPointerException ex) {
                         materialTextView_Members.setContentText("", null);
                     }
-
-                    boolean status = documentSnapshot.getBoolean("status");
-                    checkBoxStatusSetup(status);
-                    buttonJoinSetUp(documentSnapshot, memberRefList, status);
-                    buttonQuitSetup(memberRefList);
-
-
 
                     // display supervisors and handle a case where none supervisor selected
                     try {
@@ -108,6 +105,8 @@ public class ProjectInfoActivity extends AppCompatActivity {
                     String creatorEmail = task.getResult().getString("email");
                     String creatorInfo = creatorName + " <" + creatorEmail + ">";
                     materialTextView_Creator.setContentText(creatorInfo, null);
+                    if (status == false)
+                        button_Join.setEnabled(false);
                     // disable Join button if current user is the one who created the project or status is false
                     if (creatorEmail.equals(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())) {
                         button_Join.setEnabled(false);
