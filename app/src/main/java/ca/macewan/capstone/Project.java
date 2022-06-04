@@ -9,6 +9,7 @@ public class Project {
     private String description;
     private DocumentReference creator;
     private List<DocumentReference> members;
+    private boolean status;
 
     public String getName() {
         return name;
@@ -24,5 +25,9 @@ public class Project {
 
     public List<DocumentReference> getMembers() {
         return members;
+    }
+
+    public boolean getStatus() {
+        return status;
     }
 }

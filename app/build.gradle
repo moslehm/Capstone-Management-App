@@ -32,8 +32,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
@@ -47,7 +47,6 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
     implementation 'me.srodrigo:androidhintspinner:1.0.0'
     implementation 'com.github.esafirm:android-image-picker:2.3.1'
-    implementation 'com.google.android.material:material:1.6.0'
     implementation 'com.github.onemandan:MaterialTextView:0.0.5'
 }
 
