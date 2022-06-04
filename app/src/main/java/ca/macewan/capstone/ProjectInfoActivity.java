@@ -20,9 +20,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import ca.macewan.capstone.adapter.SharedMethods;
 import uk.co.onemandan.materialtextview.MaterialTextView;
@@ -70,7 +73,16 @@ public class ProjectInfoActivity extends AppCompatActivity {
                     materialTextView_Supervisor.setLabelText("Supervisor(s)");
                     button_Join.setText("Join");
 
+
                     List<DocumentReference> memberRefList = (ArrayList<DocumentReference>) documentSnapshot.get("members");
+                    if (memberRefList == null) {
+                        Map<String, Object> docData = new HashMap<>();
+                        List<DocumentReference> memberList = new ArrayList<>();
+                        docData.put("members", memberList);
+                        db.collection("Projects").document(projectID).set(docData, SetOptions.merge());
+                    }
+
+
                     boolean status = documentSnapshot.getBoolean("status");
                     checkBoxStatusSetup(status);
                     buttonJoinSetUp(documentSnapshot, memberRefList, status);
