@@ -2,12 +2,19 @@
     <string name="app_name">Capstone</string>
     <string name="Username">Username</string>
     <string name="Password">Password</string>
+    <string name="Email">Email Address</string>
     <string name="LogIn">Log In</string>
     <string name="Hello">Hello!</string>
     <string name="Project">Project</string>
     <string name="Creator">Creator</string>
     <string name="Members">Members</string>
+<<<<<<< Updated upstream
     <string name="Description">Description</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>/>
+=======
+    <string name="Description">Description</string>/>
+    <string name="SignUp">Sign Up</string>
+    <string name="SignUpWelcome">Create a Capstone account</string>
+>>>>>>> Stashed changes
 </resources>

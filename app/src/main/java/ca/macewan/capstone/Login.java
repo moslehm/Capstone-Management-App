@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
     private EditText editTextUsername, editTextPassword;
-    private Button buttonLogIn;
+    private Button buttonLogIn, buttonSignUp;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private DocumentReference documentReference;
@@ -34,10 +34,17 @@ public class Login extends AppCompatActivity {
         editTextUsername = findViewById(R.id.editText_Username);
         editTextPassword = findViewById(R.id.editText_Password);
         buttonLogIn = findViewById(R.id.button_LogIn);
+        buttonSignUp = findViewById(R.id.button_SignUp);
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 logIn();
+            }
+        });
+        buttonSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signUp();
             }
         });
     }
@@ -91,5 +98,11 @@ public class Login extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void signUp() {
+        Toast.makeText(getApplicationContext(), "Signing up.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getApplicationContext(), Signup.class);
+        startActivity(intent);
     }
 }
