@@ -1,5 +1,6 @@
 package ca.macewan.capstone.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,8 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import ca.macewan.capstone.Project;
 import ca.macewan.capstone.R;
@@ -37,8 +38,11 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
             }
         });
         holder.textViewProjectName.setText(model.getName());
-        //SharedMethods.displayItems(model.getMembers(), holder.textViewProjectMembers);
-//        holder.textViewProjectDesc.setText(model.getDescription());
+        if (!model.getStatus())
+            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
+        else
+            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+
     }
 
     public void setOnProjectListener(OnProjectListener onProjectListener) {
@@ -57,13 +61,13 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
 //        TextView textViewProjectDesc;
         TextView textViewProjectCreator;
 //        TextView textViewProjectMembers;
+        MaterialCardView materialCardViewProject;
 
         public ProjectViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewProjectName = itemView.findViewById(R.id.textView_pTitle);
             textViewProjectCreator = itemView.findViewById(R.id.textView_pCreator);
-//            textViewProjectMembers = itemView.findViewById(R.id.textView_pMembers);
-//            textViewProjectDesc = itemView.findViewById(R.id.textView_pDescription);
+            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
             itemView.setOnClickListener(this);
         }
 

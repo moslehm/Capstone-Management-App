@@ -3,6 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/activity_main_prof.xml" value="0.4239583333333333" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/activity_project_info.xml" value="0.5" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/activity_project_info_prof.xml" value="0.4048140043763676" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/activity_proposal_creation.xml" value="0.425" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_accepted.xml" value="0.4239583333333333" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_available.xml" value="0.4239583333333333" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_invited.xml" value="0.2066869300911854" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_prof.xml" value="0.425" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/fragment_list.xml" value="0.425" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/login.xml" value="0.41938405797101447" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/project_item.xml" value="0.41938405797101447" />
         <entry key="..\:/Users/PC/AndroidStudioProjects/Project4961/app/src/main/res/layout/activity_proposal_creation.xml" value="0.18958333333333333" />
         <entry key="..\:/Users/PC/AndroidStudioProjects/Project4961/app/src/main/res/layout/fragment_list.xml" value="0.1" />
         <entry key="..\:/Users/dtran/Documents/GitHub/Project496/app/src/main/res/layout/activity_main.xml" value="0.358695652173913" />

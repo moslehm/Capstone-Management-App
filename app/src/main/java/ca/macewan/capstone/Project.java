@@ -1,7 +1,6 @@
 package ca.macewan.capstone;
 
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -15,6 +14,7 @@ public class Project {
     private List<String> tags;
     private List<String> imagePaths;
     private List<DocumentReference> members;
+    private boolean status;
 
     public Project() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -71,5 +71,9 @@ public class Project {
 
     public String getYear() {
         return year;
+    }
+
+    public boolean getStatus() {
+        return status;
     }
 }
