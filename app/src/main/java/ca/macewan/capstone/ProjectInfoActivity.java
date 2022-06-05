@@ -35,7 +35,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String projectID;
     MaterialTextView materialTextView_Creator, materialTextView_Title, materialTextView_Supervisor,
-            materialTextView_Members, materialTextView_Descriptions;
+            materialTextView_Members, materialTextView_Description;
     CheckBox checkBox_Status;
 
     @Override
@@ -52,7 +52,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
         materialTextView_Title = findViewById(R.id.textiew_Title);
         materialTextView_Members = findViewById(R.id.textView_Members);
         materialTextView_Supervisor = findViewById(R.id.textView_Supervisor);
-        materialTextView_Descriptions = findViewById(R.id.textView_Description);
+        materialTextView_Description = findViewById(R.id.textView_Description);
         checkBox_Status = findViewById(R.id.checkBox_Status);
         
         db = FirebaseFirestore.getInstance();
@@ -65,13 +65,11 @@ public class ProjectInfoActivity extends AppCompatActivity {
                 if (documentSnapshot.exists()) {
                     materialTextView_Title.setContentText(documentSnapshot.getString("name"), null);
                     materialTextView_Title.setLabelText("Title");
-                    materialTextView_Descriptions.setContentText(documentSnapshot.getString("description"), null);
+                    materialTextView_Description.setContentText(documentSnapshot.getString("description"), null);
                     materialTextView_Creator.setLabelText("Creator");
-                    materialTextView_Descriptions.setLabelText("Description");
+                    materialTextView_Description.setLabelText("Description");
                     materialTextView_Members.setLabelText("Member(s)");
                     materialTextView_Supervisor.setLabelText("Supervisor(s)");
-                    button_Join.setText("Join");
-
 
                     List<DocumentReference> memberRefList = (ArrayList<DocumentReference>) documentSnapshot.get("members");
                     if (memberRefList == null) {

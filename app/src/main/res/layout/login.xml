@@ -12,35 +12,44 @@
         android:layout_height="wrap_content"
         android:text="@string/Hello"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/editText_Username"
+        app:layout_constraintBottom_toTopOf="@id/textInputLayout_Username"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/editText_Username"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_Username"
+        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/Username"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/editText_Password"
+        app:layout_constraintBottom_toTopOf="@id/textInputLayout_Password"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_Hello" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_Hello">
 
-    <EditText
-        android:id="@+id/editText_Password"
-        android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_Username"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/Username"></com.google.android.material.textfield.TextInputEditText>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_Password"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/Password"
-        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/button_LogIn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editText_Username"
-        app:layout_constraintBottom_toTopOf="@id/button_LogIn"/>
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_Username">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_Password"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/Password"
+            android:inputType="textPassword"></com.google.android.material.textfield.TextInputEditText>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/button_LogIn"
