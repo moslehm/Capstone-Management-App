@@ -41,6 +41,9 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
         holder.textViewProjectName.setText(model.getName());
         if (!model.getStatus())
             holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
+        else
+            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+
     }
 
     public void setOnProjectListener(OnProjectListener onProjectListener) {
@@ -66,7 +69,6 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
             textViewProjectName = itemView.findViewById(R.id.textView_pTitle);
             textViewProjectCreator = itemView.findViewById(R.id.textView_pCreator);
             materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
-            materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
             itemView.setOnClickListener(this);
         }
 
