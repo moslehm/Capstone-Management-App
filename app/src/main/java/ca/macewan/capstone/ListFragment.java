@@ -107,7 +107,6 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
         int id = item.getItemId();
         if (id == R.id.action_add) {
             Intent menuIntent = new Intent(getActivity(), ProposalCreationActivity.class);
-            menuIntent.putExtra("user", user);
             startActivity(menuIntent);
         }
         return super.onOptionsItemSelected(item);

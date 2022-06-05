@@ -24,13 +24,13 @@
             android:clipToPadding="false"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
+            android:paddingTop="16dp"
             tools:context=".ProposalCreationActivity">
 
             <EditText
                 android:id="@+id/editTextTitle"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="16dp"
                 android:background="@drawable/custom_input"
                 android:hint="Title"
                 android:inputType="textCapSentences"

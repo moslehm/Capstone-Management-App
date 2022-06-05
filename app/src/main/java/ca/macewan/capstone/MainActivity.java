@@ -3,17 +3,22 @@ package ca.macewan.capstone;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -61,22 +66,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setup(){
-        user = (User) getIntent().getSerializableExtra("user");
+        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        FirebaseFirestore.getInstance()
+        .collection("Users")
+        .document(email)
+        .get()
+        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot.exists()) {
+                        user = documentSnapshot.toObject(User.class);
+                        setupAllFragments();
+                    }
+                }
+            }
 
-        homeFragment = new HomeFragment(user);
-        listFragment = new ListFragment(user);
-        settingsFragment = new SettingsFragment();
-        selected = homeFragment;
+            private void setupAllFragments() {
+                homeFragment = new HomeFragment(user);
+                listFragment = new ListFragment(user);
+                settingsFragment = new SettingsFragment();
+                selected = homeFragment;
 
-        createFragment(homeFragment);
-        createFragment(listFragment);
-        createFragment(settingsFragment);
-        showFragment(selected);
+                createFragment(homeFragment, "home");
+                createFragment(listFragment, "list");
+                createFragment(settingsFragment, "settings");
+                showFragment(selected);
+            }
+        });
     }
 
-    private void createFragment(Fragment fragment){
+    private void createFragment(Fragment fragment, String tag){
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fl_wrapper, fragment)
+                .add(R.id.fl_wrapper, fragment, tag)
                 .hide(fragment)
                 .commit();
     }

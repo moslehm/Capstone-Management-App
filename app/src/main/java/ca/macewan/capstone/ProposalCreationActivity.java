@@ -37,9 +37,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -155,8 +157,8 @@ public class ProposalCreationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Setup Creator, Title, Description, semester, and supervisor values
-                User user = (User) getIntent().getSerializableExtra("user");
-                DocumentReference creator =  db.collection("Users").document(user.email);
+                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                DocumentReference creator =  db.collection("Users").document(email);
                 String title = editTextTitle.getText().toString();
                 String description = editTextDescription.getText().toString();
                 String year = editTextYear.getText().toString();
@@ -175,6 +177,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<DocumentReference> task) {
                                 if (task.isSuccessful()) {
                                     DocumentReference projectRef = task.getResult();
+                                    creator.update("projects", FieldValue.arrayUnion(projectRef));
                                     projectRef.update("tags", tags);
                                     if (linearLayoutImages.getChildCount() - 1 == 0) {
                                         finish();

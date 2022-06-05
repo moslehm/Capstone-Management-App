@@ -67,10 +67,9 @@ public class Login extends AppCompatActivity {
                                     DocumentSnapshot documentSnapshot = task.getResult();
                                     Toast toast = null;
                                     if (documentSnapshot.exists()) {
-                                        User user = documentSnapshot.toObject(User.class);
+//                                        User user = documentSnapshot.toObject(User.class);
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                        intent.putExtra("user", user);
-
+//                                        intent.putExtra("user", user);
                                         startActivity(intent);
                                     }
                                     else {

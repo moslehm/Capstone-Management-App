@@ -30,6 +30,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
 //    TextView title, creator, description, members, supervisors;
     Button button_Join;
     FirebaseFirestore db;
+    FirebaseAuth mAuth;
     String projectID;
     MaterialTextView materialTextView_Creator, materialTextView_Title, materialTextView_Supervisor,
             materialTextView_Members, materialTextView_Descriptions;
@@ -49,6 +50,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
         materialTextView_Supervisor = findViewById(R.id.textView_Supervisor);
         materialTextView_Descriptions = findViewById(R.id.textView_Description);
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         projectID = getIntent().getExtras().getString("projectID");
         db.collection("Projects").document(projectID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -68,7 +70,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
 
                     // display members and handle a case where no one has joined yet
                     try {
-                        SharedMethods.displayItems((ArrayList<DocumentReference>) documentSnapshot.get("members"), materialTextView_Members);
+                        SharedMethods.displayItems(documentSnapshot.get("members"), materialTextView_Members);
                     } catch (NullPointerException ex) {
                         materialTextView_Members.setContentText("", null);
                     }
@@ -83,7 +85,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
                                 String creatorInfo = creatorName + " <" + creatorEmail + ">";
                                 materialTextView_Creator.setContentText(creatorInfo, null);
                                 // disable Join button if current user is the one who created the project
-                                if (creatorEmail.equals(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())) {
+                                if (creatorEmail.equals(mAuth.getCurrentUser().getEmail().toString())) {
                                     button_Join.setEnabled(false);
                                 }
                                 else {
@@ -93,7 +95,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
                                             List<DocumentReference> memberRefList = (List<DocumentReference>) documentSnapshot.get("members");
                                             // prompt if user already joined the project
                                             if (memberRefList.contains(db.collection("Users")
-                                                    .document(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString()))) {
+                                                    .document(mAuth.getCurrentUser().getEmail().toString()))) {
                                                 new AlertDialog.Builder(ProjectInfoActivity.this)
                                                         .setMessage("You already joined this project")
                                                         .show();
@@ -106,14 +108,17 @@ public class ProjectInfoActivity extends AppCompatActivity {
                                                                 db.collection("Projects").document(projectID)
                                                                         .update("members",
                                                                                 FieldValue.arrayUnion(db.collection("Users")
-                                                                                        .document(FirebaseAuth.getInstance().getCurrentUser().getEmail().toString())));
+                                                                                        .document(mAuth.getCurrentUser().getEmail())));
                                                                 db.collection("Projects").document(projectID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                        DocumentReference creator =  db.collection("Users").document(mAuth.getCurrentUser().getEmail());
+                                                                        DocumentReference projectRef = task.getResult().getReference();
+                                                                        creator.update("projects", FieldValue.arrayUnion(projectRef));
                                                                         DocumentSnapshot documentSnapshot = task.getResult();
                                                                         if (documentSnapshot.exists()) {
                                                                             try {
-                                                                                SharedMethods.displayItems((ArrayList<DocumentReference>) documentSnapshot.get("members"), materialTextView_Members);
+                                                                                SharedMethods.displayItems(documentSnapshot.get("members"), materialTextView_Members);
                                                                             } catch (NullPointerException ex) {
                                                                                 materialTextView_Members.setContentText("", null);
                                                                             }
@@ -151,7 +156,7 @@ public class ProjectInfoActivity extends AppCompatActivity {
 
                     // display supervisors and handle a case where none supervisor selected
                     try {
-                        SharedMethods.displayItems((List<DocumentReference>) documentSnapshot.get("supervisors"), materialTextView_Supervisor);
+                        SharedMethods.displayItems(documentSnapshot.get("supervisors"), materialTextView_Supervisor);
                     } catch (NullPointerException ex) {
                         materialTextView_Supervisor.setContentText("", null);
 //                        supervisors.setText("");
