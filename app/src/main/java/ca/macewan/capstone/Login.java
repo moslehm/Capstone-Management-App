@@ -101,7 +101,6 @@ public class Login extends AppCompatActivity {
     }
 
     private void signUp() {
-        Toast.makeText(getApplicationContext(), "Signing up.", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getApplicationContext(), Signup.class);
         startActivity(intent);
     }
