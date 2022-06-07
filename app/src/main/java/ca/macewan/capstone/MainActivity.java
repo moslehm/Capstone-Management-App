@@ -26,11 +26,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     User user;
     public HomeFragment homeFragment;
-    public ListFragment listFragment;
+    public Fragment listFragment;
     public SettingsFragment settingsFragment;
     Fragment selected;
 
@@ -85,7 +86,11 @@ public class MainActivity extends AppCompatActivity {
 
             private void setupAllFragments() {
                 homeFragment = new HomeFragment(user);
-                listFragment = new ListFragment(user);
+                if (Objects.equals(user.role, "student")) {
+                    listFragment = new ListFragment(user);
+                } else if (Objects.equals(user.role, "professor")) {
+                    listFragment = new ProfListFragment();
+                }
                 settingsFragment = new SettingsFragment();
                 selected = homeFragment;
 

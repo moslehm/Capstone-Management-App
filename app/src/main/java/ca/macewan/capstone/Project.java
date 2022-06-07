@@ -11,6 +11,7 @@ public class Project {
     private String semester;
     private String year;
     private List<DocumentReference> supervisors;
+    private List<DocumentReference> supervisorsInvited;
     private List<String> tags;
     private List<String> imagePaths;
     private List<DocumentReference> members;
@@ -20,13 +21,13 @@ public class Project {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Project(DocumentReference creator, String title, String description, String semester, String year, List<DocumentReference> supervisors) {
+    public Project(DocumentReference creator, String title, String description, String semester, String year) {
         this.creator = creator;
         this.name = title;
         this.description = description;
         this.semester = semester;
         this.year = year;
-        this.supervisors = supervisors;
+        this.status = true;
     }
 
     public String getName() {
@@ -75,5 +76,13 @@ public class Project {
 
     public boolean getStatus() {
         return status;
+    }
+
+    public List<DocumentReference> getSupervisorsInvited() {
+        return supervisorsInvited;
+    }
+
+    public void setSupervisorsInvited(List<DocumentReference> supervisorsInvited) {
+        this.supervisorsInvited = supervisorsInvited;
     }
 }

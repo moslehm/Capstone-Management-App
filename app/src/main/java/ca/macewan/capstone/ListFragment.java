@@ -58,9 +58,6 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     }
 
     public void setUp() {
-//        textViewRole = (TextView) findViewById(R.id.textView_Role);
-//        textViewName = (TextView) findViewById(R.id.textView_Name);
-//        recyclerViewProject = (RecyclerView) findViewById(R.id.recyclerView_Project);
         textViewName.setText(user.name);
         textViewRole.setText(user.role);
 

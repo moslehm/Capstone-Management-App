@@ -5,108 +5,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout_Inner"
+    <ScrollView
+        android:id="@+id/projectScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/checkBox_Status"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/view">
+        <include
+            android:id="@+id/projectLayout"
+            layout="@layout/project_information"/>
+    </ScrollView>
+
+
+
+    <View
+        android:id="@+id/shadowView"
+        android:layout_width="wrap_content"
+        android:layout_above="@id/view"
+        android:layout_height="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/shadow"
+        app:layout_constraintBottom_toTopOf="@+id/view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <uk.co.onemandan.materialtextview.MaterialTextView
-            android:id="@+id/textiew_Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="5dp"
-            app:layout_constraintBottom_toTopOf="@id/textView_Creator"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <uk.co.onemandan.materialtextview.MaterialTextView
-            android:id="@+id/textView_Creator"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="5dp"
-            app:layout_constraintBottom_toTopOf="@+id/textView_Supervisor"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textiew_Title" />
-
-        <uk.co.onemandan.materialtextview.MaterialTextView
-            android:id="@+id/textView_Supervisor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="5dp"
-            app:layout_constraintBottom_toTopOf="@id/textView_Description"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_Creator" />
-
-        <uk.co.onemandan.materialtextview.MaterialTextView
-            android:id="@+id/textView_Description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="5dp"
-            app:layout_constraintBottom_toTopOf="@id/textView_Members"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView_Supervisor" />
-
-        <uk.co.onemandan.materialtextview.MaterialTextView
-            android:id="@+id/textView_Members"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textView_Description" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/projectScrollView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/button_Join"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="join"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/button_Withdraw"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95" />
+        android:text="Join"
+        app:layout_constraintTop_toTopOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="@+id/view"
+        app:layout_constraintStart_toStartOf="@+id/view"
+        app:layout_constraintEnd_toStartOf="@+id/button_Withdraw" />
 
     <Button
         android:id="@+id/button_Withdraw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="quit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Quit"
+        app:layout_constraintTop_toTopOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="@+id/view"
         app:layout_constraintStart_toEndOf="@+id/button_Join"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95" />
+        app:layout_constraintEnd_toEndOf="@id/view" />
 
-    <CheckBox
-        android:id="@+id/checkBox_Status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Available"
-        app:layout_constraintBottom_toTopOf="@+id/button_Join"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.118"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.95" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

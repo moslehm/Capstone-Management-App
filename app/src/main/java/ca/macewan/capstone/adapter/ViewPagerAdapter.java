@@ -17,18 +17,14 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position) {
-            case 2:
-                return new ProfInvited();
-            case 1:
-                return new ProfAccepted();
-            default:
-                return new ProfAll();
+        if (position == 1) {
+            return new ProfInvited();
         }
+        return new ProfAll();
     }
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 2;
     }
 }

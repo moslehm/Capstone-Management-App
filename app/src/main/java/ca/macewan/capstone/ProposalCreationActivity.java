@@ -162,72 +162,77 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 String title = editTextTitle.getText().toString();
                 String description = editTextDescription.getText().toString();
                 String year = editTextYear.getText().toString();
-                List<DocumentReference> supervisors = new ArrayList<DocumentReference>();
-                for (int i = 0; i < arrayListSupervisors.size(); i++) {
-                    if (selectedSupervisors[i]) {
-                        supervisors.add(db.collection("Users").document(arrayListSupervisors.get(i).email));
-                    }
-                }
-                Project project = new Project(creator, title, description, selectedSemester, year, supervisors);
+                Project project = new Project(creator, title, description, selectedSemester, year);
 
                 db.collection("Projects")
-                        .add(project)
-                        .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentReference> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentReference projectRef = task.getResult();
-                                    creator.update("projects", FieldValue.arrayUnion(projectRef));
-                                    projectRef.update("tags", tags);
-                                    if (linearLayoutImages.getChildCount() - 1 == 0) {
-                                        finish();
-                                    }
-                                    uploadImages(projectRef);
+                    .add(project)
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                            if (task.isSuccessful()) {
+                                DocumentReference projectRef = task.getResult();
+                                inviteSupervisors(projectRef);
+                                creator.update("projects", FieldValue.arrayUnion(projectRef));
+                                projectRef.update("tags", tags);
+                                if (linearLayoutImages.getChildCount() - 1 == 0) {
+                                    finish();
                                 }
+                                uploadImages(projectRef);
                             }
+                        }
 
-                            private void uploadImages(DocumentReference projectRef) {
-                                String projectID = projectRef.getId();
-                                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                                StorageReference imageRef = null;
-                                List<UploadTask> myTasks = new ArrayList<>();
-                                for (int i = 0; i < linearLayoutImages.getChildCount() - 1; i++) {
-                                    DeletableImageView image = (DeletableImageView) linearLayoutImages.getChildAt(i);
-                                    imageRef = storageRef.child("project_images/" + projectID + "/" + image.getUri().getLastPathSegment());
-                                    InputStream stream = null;
-                                    try {
-                                        stream = new FileInputStream(image.getUri().getPath());
-                                    } catch (FileNotFoundException e) {
-                                        e.printStackTrace();
-                                    }
-                                    myTasks.add(imageRef.putStream(stream));
+                        private void uploadImages(DocumentReference projectRef) {
+                            String projectID = projectRef.getId();
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                            StorageReference imageRef = null;
+                            List<UploadTask> myTasks = new ArrayList<>();
+                            for (int i = 0; i < linearLayoutImages.getChildCount() - 1; i++) {
+                                DeletableImageView image = (DeletableImageView) linearLayoutImages.getChildAt(i);
+                                imageRef = storageRef.child("project_images/" + projectID + "/" + image.getUri().getLastPathSegment());
+                                InputStream stream = null;
+                                try {
+                                    stream = new FileInputStream(image.getUri().getPath());
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
                                 }
-                                Tasks.whenAllSuccess(myTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
-                                    @Override
-                                    public void onSuccess(List<Object> objects) {
-                                        List<Task<Uri>> tasks = new ArrayList<Task<Uri>>();
-                                        for (Object object : objects) {
-                                            UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) object;
-                                            tasks.add(snapshot.getMetadata().getReference().getDownloadUrl());
-                                        }
-                                        Tasks.whenAllSuccess(tasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
-                                            @Override
-                                            public void onSuccess(List<Object> objects) {
-                                                List<String> imagePaths = new ArrayList<String>();
-                                                for (Object object : objects) {
-                                                    Uri uri = (Uri) object;
-                                                    imagePaths.add(uri.toString());
-                                                    finish();
-                                                }
-                                                projectRef.update("imagePaths", imagePaths);
-                                            }
-                                        });
-                                    }
-                                });
+                                myTasks.add(imageRef.putStream(stream));
                             }
-                        });
+                            Tasks.whenAllSuccess(myTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                                @Override
+                                public void onSuccess(List<Object> objects) {
+                                    List<Task<Uri>> tasks = new ArrayList<Task<Uri>>();
+                                    for (Object object : objects) {
+                                        UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) object;
+                                        tasks.add(snapshot.getMetadata().getReference().getDownloadUrl());
+                                    }
+                                    Tasks.whenAllSuccess(tasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                                        @Override
+                                        public void onSuccess(List<Object> objects) {
+                                            List<String> imagePaths = new ArrayList<String>();
+                                            for (Object object : objects) {
+                                                Uri uri = (Uri) object;
+                                                imagePaths.add(uri.toString());
+                                                finish();
+                                            }
+                                            projectRef.update("imagePaths", imagePaths);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
             }
         });
+    }
+
+    private void inviteSupervisors(DocumentReference projectRef) {
+       for (int i = 0; i < arrayListSupervisors.size(); i++) {
+            if (selectedSupervisors[i]) {
+                DocumentReference supervisor = db.collection("Users").document(arrayListSupervisors.get(i).email);
+                supervisor.update("invited", FieldValue.arrayUnion(projectRef));
+                projectRef.update("supervisorsInvited", FieldValue.arrayUnion(supervisor));
+            }
+        }
     }
 
     private void checkRequiredFields() {

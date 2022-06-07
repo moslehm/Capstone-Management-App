@@ -86,11 +86,11 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         @Override
         public void onClick(View v) {
             onProjectListener.onProjectClick(getBindingAdapterPosition(),
-                    documentReferenceList.get(getBindingAdapterPosition()).getId());
+                    documentReferenceList.get(getBindingAdapterPosition()).getPath());
         }
     }
 
     public interface OnProjectListener {
-        void onProjectClick(int position, String projectID);
+        void onProjectClick(int position, String projectPath);
     }
 }
