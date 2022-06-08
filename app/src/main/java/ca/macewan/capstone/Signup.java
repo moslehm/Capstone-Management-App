@@ -13,19 +13,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Signup extends AppCompatActivity {
     private TextView error;
-    private EditText usernameField, passwordField, emailField, nameField;
+    private EditText emailField, passwordField, confirmPassword, nameField;
     private Button signup;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -37,10 +34,9 @@ public class Signup extends AppCompatActivity {
         setContentView(R.layout.signup);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        usernameField = findViewById(R.id.signUpUsername);
-        passwordField = findViewById(R.id.signUpPassword);
-        nameField = findViewById(R.id.signUpFullName);
         emailField = findViewById(R.id.signUpEmail);
+        passwordField = findViewById(R.id.signUpPassword);
+        confirmPassword = findViewById(R.id.signUpConfirmPassword);
         signup = findViewById(R.id.signUpButton);
         error = findViewById(R.id.errorText);
 
@@ -76,26 +72,13 @@ public class Signup extends AppCompatActivity {
     }
 
     private void signUp() {
-        String username = usernameField.getText().toString();
         String password = passwordField.getText().toString();
         String name = nameField.getText().toString();
         String email = emailField.getText().toString();
         errorString = "";
 
-        if (username.equals("")) {
-            errorString += "Username cannot be empty.\n";
-        }
-
-        if (!username.equals("")) {
-            firebaseFirestore = FirebaseFirestore.getInstance();
-            DocumentReference documentReference = firebaseFirestore.collection("Usernames")
-                    .document(username);
-            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            updateString("Username already exists.");
-                        }
-            });
+        if (email.equals("")) {
+            errorString += "Email address cannot be empty.\n";
         }
 
         if (name.equals ("")) {
@@ -106,8 +89,8 @@ public class Signup extends AppCompatActivity {
             errorString += "Password cannot be empty.\n";
         }
 
-        if (email.equals("")) {
-            errorString += "Email address cannot be empty.\n";
+        if (!password.equals(confirmPassword.getText().toString())) {
+            errorString += "Both passwords must match.\n";
         }
 
         if (!email.equals("")) {
@@ -123,7 +106,7 @@ public class Signup extends AppCompatActivity {
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         CollectionReference usersRef = firebaseFirestore.collection("Users");
-        User user = new User(email, name, email.endsWith("@macewan.ca") ? "teacher" : "student");
+        User user = new User(email, name, email.endsWith("@macewan.ca") ? "professor" : "student");
         usersRef.document(email).set(user);
         firebaseAuth.createUserWithEmailAndPassword(email, password);
         finish();
