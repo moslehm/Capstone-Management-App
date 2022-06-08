@@ -73,9 +73,9 @@ public class ProfInvited extends Fragment {
                             recyclerView_Invited.setLayoutManager(new LinearLayoutManager(getActivity()));
                             recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
                                 @Override
-                                public void onProjectClick(int position, String projectID) {
+                                public void onProjectClick(int position, String projectPath) {
                                     Intent intent = new Intent(getContext(), ProjectInfoActivityProf.class);
-                                    intent.putExtra("projectID", projectID);
+                                    intent.putExtra("projectPath", projectPath);
                                     activityResultLauncher.launch(intent);
                                 }
                             });
@@ -95,9 +95,9 @@ public class ProfInvited extends Fragment {
                             recyclerView_Invited.setAdapter(recyclerAdapterV2);
                             recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
                                 @Override
-                                public void onProjectClick(int position, String projectID) {
+                                public void onProjectClick(int position, String projectPath) {
                                     Intent intent = new Intent(getContext(), ProjectInfoActivityProf.class);
-                                    intent.putExtra("projectID", projectID);
+                                    intent.putExtra("projectPath", projectPath);
                                     activityResultLauncher.launch(intent);
                                 }
                             });

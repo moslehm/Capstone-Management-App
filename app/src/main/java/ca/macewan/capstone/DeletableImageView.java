@@ -10,11 +10,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class DeletableImageView extends LinearLayout {
-
     private ImageView imageView;
     private ImageButton mButton;
     private LinearLayout linearLayout;
     private int index;
+    private Uri uri;
     private ImageButton buttonAttachImage;
     private HorizontalScrollView scrollViewImages;
 
@@ -71,7 +71,12 @@ public class DeletableImageView extends LinearLayout {
     }
 
     public void setImage(String filePath) {
-        imageView.setImageURI(Uri.parse(filePath));
+        uri = Uri.parse(filePath);
+        imageView.setImageURI(uri);
+    }
+
+    public Uri getUri() {
+        return uri;
     }
 
     public void setIndex(int i) {

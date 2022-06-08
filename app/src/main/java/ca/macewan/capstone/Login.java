@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,7 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
-    private TextInputEditText editTextUsername, editTextPassword;
+    private EditText editTextUsername, editTextPassword;
     private Button buttonLogIn;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -68,17 +67,9 @@ public class Login extends AppCompatActivity {
                                     DocumentSnapshot documentSnapshot = task.getResult();
                                     Toast toast = null;
                                     if (documentSnapshot.exists()) {
-                                        Intent intent = null;
-                                        String role = documentSnapshot.get("role").toString();
-                                        String name = documentSnapshot.get("name").toString();
-                                        if (role.equals("student")) {
-                                            intent = new Intent(getApplicationContext(), MainActivity.class); 
-                                        }
-                                        else if (role.equals("professor")) {
-                                            intent = new Intent(getApplicationContext(), ProfMain.class);
-                                        }
-                                        intent.putExtra("role", role);
-                                        intent.putExtra("name", name);
+//                                        User user = documentSnapshot.toObject(User.class);
+                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                                        intent.putExtra("user", user);
                                         startActivity(intent);
                                     }
                                     else {

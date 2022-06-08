@@ -1,5 +1,6 @@
 package ca.macewan.capstone;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,26 +30,50 @@ import android.widget.Toast;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observer;
 
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
 
 
 public class ProposalCreationActivity extends AppCompatActivity {
-    EditText editTextTitle, editTextDescription;
+    FirebaseFirestore db;
+    EditText editTextTitle, editTextDescription, editTextYear;
     String selectedSemester;
-    String[] supervisors = {"supervisor1", "supervisor2", "supervisor3", "supervisor4"};
+    ArrayList<User> arrayListSupervisors;
     boolean[] selectedSupervisors;
     ArrayList<Integer> supervisorList = new ArrayList<>();
     private EditText editTextSupervisors, editTextKeyword;
     public AlertDialog alertDialogSupervisor;
+    List<String> tags;
     private HorizontalScrollView scrollViewTags;
     private ChipGroup chipGroup;
     private ImageButton buttonAttachImage;
@@ -65,9 +91,11 @@ public class ProposalCreationActivity extends AppCompatActivity {
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        db = FirebaseFirestore.getInstance();
+
         String[] semesters = {"Fall", "Winter", "Spring", "Summer"};
         Spinner semestersSpinner = (Spinner) findViewById(R.id.spinnerSemester);
-        addSpinner(semestersSpinner, semesters, "Semesters");
+        addSpinner(semestersSpinner, semesters, "Semester");
 
         setupSupervisors();
         setupTagChips();
@@ -107,21 +135,113 @@ public class ProposalCreationActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+
+        editTextYear = (EditText) findViewById(R.id.editTextYear);
+        editTextYear.addTextChangedListener (new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                checkRequiredFields();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                // Setup Creator, Title, Description, semester, and supervisor values
+                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                DocumentReference creator =  db.collection("Users").document(email);
+                String title = editTextTitle.getText().toString();
+                String description = editTextDescription.getText().toString();
+                String year = editTextYear.getText().toString();
+                Project project = new Project(creator, title, description, selectedSemester, year);
+
+                db.collection("Projects")
+                    .add(project)
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                            if (task.isSuccessful()) {
+                                DocumentReference projectRef = task.getResult();
+                                inviteSupervisors(projectRef);
+                                creator.update("projects", FieldValue.arrayUnion(projectRef));
+                                projectRef.update("tags", tags);
+                                if (linearLayoutImages.getChildCount() - 1 == 0) {
+                                    finish();
+                                }
+                                uploadImages(projectRef);
+                            }
+                        }
+
+                        private void uploadImages(DocumentReference projectRef) {
+                            String projectID = projectRef.getId();
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                            StorageReference imageRef = null;
+                            List<UploadTask> myTasks = new ArrayList<>();
+                            for (int i = 0; i < linearLayoutImages.getChildCount() - 1; i++) {
+                                DeletableImageView image = (DeletableImageView) linearLayoutImages.getChildAt(i);
+                                imageRef = storageRef.child("project_images/" + projectID + "/" + image.getUri().getLastPathSegment());
+                                InputStream stream = null;
+                                try {
+                                    stream = new FileInputStream(image.getUri().getPath());
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                                myTasks.add(imageRef.putStream(stream));
+                            }
+                            Tasks.whenAllSuccess(myTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                                @Override
+                                public void onSuccess(List<Object> objects) {
+                                    List<Task<Uri>> tasks = new ArrayList<Task<Uri>>();
+                                    for (Object object : objects) {
+                                        UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) object;
+                                        tasks.add(snapshot.getMetadata().getReference().getDownloadUrl());
+                                    }
+                                    Tasks.whenAllSuccess(tasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                                        @Override
+                                        public void onSuccess(List<Object> objects) {
+                                            List<String> imagePaths = new ArrayList<String>();
+                                            for (Object object : objects) {
+                                                Uri uri = (Uri) object;
+                                                imagePaths.add(uri.toString());
+                                                finish();
+                                            }
+                                            projectRef.update("imagePaths", imagePaths);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
             }
         });
+    }
+
+    private void inviteSupervisors(DocumentReference projectRef) {
+       for (int i = 0; i < arrayListSupervisors.size(); i++) {
+            if (selectedSupervisors[i]) {
+                DocumentReference supervisor = db.collection("Users").document(arrayListSupervisors.get(i).email);
+                supervisor.update("invited", FieldValue.arrayUnion(projectRef));
+                projectRef.update("supervisorsInvited", FieldValue.arrayUnion(supervisor));
+            }
+        }
     }
 
     private void checkRequiredFields() {
         boolean titleEmpty = editTextTitle.getText().toString().isEmpty();
         boolean descriptionEmpty = editTextDescription.getText().toString().isEmpty();
         boolean semesterChosen = selectedSemester != null;
+        boolean yearEmpty = editTextYear.getText().toString().isEmpty();
         boolean supervisorsChosen = anySupervisorsSelected();
-        buttonSubmit.setEnabled(!titleEmpty && !descriptionEmpty && semesterChosen && supervisorsChosen);
+        buttonSubmit.setEnabled(!titleEmpty && !descriptionEmpty && semesterChosen && !yearEmpty && supervisorsChosen);
     }
 
     public boolean anySupervisorsSelected() {
@@ -133,6 +253,28 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     private void setupSupervisors() {
+        arrayListSupervisors = new ArrayList<User>();
+        db.collection("Users")
+                .whereEqualTo("role", "professor")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                arrayListSupervisors.add(document.toObject(User.class));
+                            }
+                            populateAlertDialog();
+                        }
+                    }
+                });
+    }
+
+    private void populateAlertDialog() {
+        String[] supervisors = new String[arrayListSupervisors.size()];
+        for (int i = 0; i < arrayListSupervisors.size(); i++){
+            supervisors[i] = arrayListSupervisors.get(i).name;
+        }
         editTextSupervisors = findViewById(R.id.editTextSupervisors);
         selectedSupervisors = new boolean[supervisors.length];
 
@@ -180,6 +322,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
         });
     }
 
+
     private void addSpinner(Spinner spinner, String[] stringArray, String hint) {
         HintSpinner<String> hintSpinner = new HintSpinner<String>(
                 spinner,
@@ -203,6 +346,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     private void setupTagChips() {
+        tags = new ArrayList<String>();
         scrollViewTags = (HorizontalScrollView) findViewById(R.id.scrollViewTags);
         editTextKeyword = (EditText) findViewById(R.id.editTextTags);
         chipGroup = (ChipGroup) findViewById(R.id.chipGroup);
@@ -246,6 +390,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
             // Create a Chip from Layout.
             Chip newChip = (Chip) inflater.inflate(R.layout.layout_entry_chip, this.chipGroup, false);
             newChip.setText(keyword);
+            tags.add(keyword);
             this.chipGroup.addView(newChip);
             newChip.setClickable(false);
             newChip.setOnCloseIconClickListener(new View.OnClickListener() {
@@ -269,6 +414,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
 
     private void handleChipCloseIconClicked(Chip chip) {
         chipGroup.removeView(chip);
+        tags.remove((String) chip.getText());
     }
 
     private void setupImageAttachment() {
@@ -319,7 +465,8 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 DeletableImageView imageView;
                 int i = currentSize;
                 int index = 0;
-                // Layout Params for first image if none are in there
+                // Layout Params for first image if no images are already attached
+                // This allows us to have the larger margin on the left
                 if (linearLayoutImages.getChildCount() == 0) {
                     filePath = images.get(0).getPath();
                     parms.rightMargin = inbetweenImagesMargin;

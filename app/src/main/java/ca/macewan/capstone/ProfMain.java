@@ -32,9 +32,6 @@ public class ProfMain extends AppCompatActivity {
                         tab.setText("All");
                         break;
                     case 1:
-                        tab.setText("Accepted");
-                        break;
-                    case 2:
                         tab.setText("Invited");
                         break;
                 }
