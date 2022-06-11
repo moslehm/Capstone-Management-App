@@ -6,16 +6,17 @@ import java.util.List;
 
 public class Project {
     private DocumentReference creator;
-    private String name;
     private String description;
-    private String semester;
-    private String year;
-    private List<DocumentReference> supervisors;
-    private List<DocumentReference> supervisorsInvited;
-    private List<String> tags;
     private List<String> imagePaths;
     private List<DocumentReference> members;
+    private String name;
+    private String semester;
     private boolean status;
+    private List<DocumentReference> supervisors;
+    private List<DocumentReference> supervisorsPending;
+    private List<String> tags;
+    private String year;
+
 
     public Project() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -78,11 +79,11 @@ public class Project {
         return status;
     }
 
-    public List<DocumentReference> getSupervisorsInvited() {
-        return supervisorsInvited;
+    public List<DocumentReference> getSupervisorsPending() {
+        return supervisorsPending;
     }
 
-    public void setSupervisorsInvited(List<DocumentReference> supervisorsInvited) {
-        this.supervisorsInvited = supervisorsInvited;
+    public void setSupervisorsPending(List<DocumentReference> supervisorsPending) {
+        this.supervisorsPending = supervisorsPending;
     }
 }
