@@ -6,9 +6,22 @@
     tools:context=".SettingsFragment">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Settings"/>
+        android:id="@+id/settingsProfile"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/settings_border"
+        android:paddingLeft="16dp"
+        android:text="Profile"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textSize="48sp" />
+
+    <TextView
+        android:id="@+id/settingsSettings"
+        android:layout_width="match_parent"
+        android:layout_height="67dp"
+        android:layout_below="@+id/settingsProfile"
+        android:layout_marginTop="1dp"
+        android:text="TextView" />
 
 </RelativeLayout>
