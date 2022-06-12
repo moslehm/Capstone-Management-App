@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,21 +8,98 @@
 
     <TextView
         android:id="@+id/settingsProfile"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="@drawable/settings_border"
-        android:paddingLeft="16dp"
-        android:text="Profile"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center|start"
+        android:text="@string/profile"
         android:textAlignment="textStart"
         android:textAllCaps="false"
-        android:textSize="48sp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_baseline_person_24"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsText" />
 
     <TextView
-        android:id="@+id/settingsSettings"
-        android:layout_width="match_parent"
-        android:layout_height="67dp"
+        android:id="@+id/settingsPreferences"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
         android:layout_below="@+id/settingsProfile"
-        android:layout_marginTop="1dp"
-        android:text="TextView" />
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/preferences"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsProfile"
+        app:drawableTint="@color/black"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_settings" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/settingsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/settings"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/settingsHelp"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/help_and_support"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsPreferences"
+        app:drawableStartCompat="@drawable/ic_baseline_help_outline_24"
+        app:drawableTint="@color/black"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24" />
+
+    <TextView
+        android:id="@+id/settingsSignOut"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/sign_out"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_baseline_login_24"
+        app:drawableTint="@color/design_default_color_error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsAbout"
+        tools:text="Sign Out" />
+
+    <TextView
+        android:id="@+id/settingsAbout"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/about"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsHelp"
+        app:drawableTint="@color/black"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_outline_info_24" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,7 +16,6 @@
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:textColorHint="#757575"
-        app:layout_constraintBottom_toTopOf="@+id/signUpButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signUpFullNameText"
@@ -26,14 +25,14 @@
         android:id="@+id/signUpFullNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/Full_Name"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/signUpFullName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.287"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signUpConfirmPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/signupText" />
 
     <TextView
         android:id="@+id/signUpConfirmPasswordText"
@@ -111,13 +110,14 @@
         android:id="@+id/signUpEmailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/Email"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/signUpEmail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.314"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/errorText" />
+        app:layout_constraintTop_toBottomOf="@+id/signUpFullName" />
 
     <TextView
         android:id="@+id/signUpPasswordText"
@@ -135,11 +135,11 @@
         android:id="@+id/signUpButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="16dp"
         android:text="@string/SignUp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signUpFullName" />
+        app:layout_constraintTop_toBottomOf="@+id/signUpConfirmPassword" />
 
     <TextView
         android:id="@+id/errorText"
