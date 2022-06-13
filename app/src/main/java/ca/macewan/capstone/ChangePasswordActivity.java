@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,19 +31,41 @@ public class ChangePasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
+
+        getSupportActionBar().setTitle("Change Password");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         firebaseAuth = FirebaseAuth.getInstance();
         currentPassword = findViewById(R.id.pwChangeCurrent);
         newPassword = findViewById(R.id.pwChangeNew);
         newPasswordConfirm = findViewById(R.id.pwChangeNewConfirm);
         changePasswordButton = findViewById(R.id.pwChangeConfirm);
+
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changePassword();
+
+                if (newPassword.getText().toString().equals(newPasswordConfirm.getText().toString()))
+                {
+                    changePassword();
+                } else {
+                    newPassword.setError("New passwords must match!");
+                    newPasswordConfirm.setError("New passwords must match!");
+                }
             }
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     private void changePassword() {
         user = FirebaseAuth.getInstance().getCurrentUser();
         AuthCredential creds = EmailAuthProvider.getCredential(user.getEmail(), currentPassword.getText().toString());
@@ -59,7 +82,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                                 Toast.makeText(getApplicationContext(), "Password successfully changed", Toast.LENGTH_SHORT);
                                                 finish();
                                             } else {
-                                                Toast.makeText(getApplicationContext(), "Error: Password change unsuccessful", Toast.LENGTH_SHORT);
+                                                newPassword.setError("Password is not strong enough, it must be at least 6 characters");
+                                                newPassword.requestFocus();
                                             }
                                         }
                                     });
