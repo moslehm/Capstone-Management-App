@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,15 +17,16 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.macewan.capstone.R;
 
-public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.ViewHolder> {
+public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapter.ViewHolder> {
     List<DocumentReference> documentReferenceList;
     OnProjectListener onProjectListener;
 
-    public RecyclerAdapterV2(List<DocumentReference> documentReferenceList) {
+    public HomeRecyclerAdapter(List<DocumentReference> documentReferenceList) {
         this.documentReferenceList = documentReferenceList;
     }
 
@@ -32,7 +34,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.project_item, parent, false);
-        RecyclerAdapterV2.ViewHolder viewHolder = new RecyclerAdapterV2.ViewHolder(view);
+        HomeRecyclerAdapter.ViewHolder viewHolder = new HomeRecyclerAdapter.ViewHolder(view);
         return viewHolder;
     }
 
@@ -42,22 +44,19 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                holder.textView_pTitle.setText(task.getResult().get("name").toString());
-                DocumentReference creatorRef = (DocumentReference) task.getResult().get("creator");
-                creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            holder.textView_pCreator.setText(task.getResult().get("name").toString() +
-                                    " <" + task.getResult().get("email").toString() + ">");
-                        }
+                    DocumentSnapshot snapshot = task.getResult();
+                    holder.textView_pTitle.setText(snapshot.getString("name"));
+                    String semesterAndYear = snapshot.getString("semester") + " " + snapshot.getString("year");
+                    holder.textView_pSemesterAndYear.setText(semesterAndYear);
+                    ArrayList<String> tagsList = (ArrayList<String>) snapshot.get("tags");
+                    if (tagsList != null) {
+                        holder.textView_pTags.setText(android.text.TextUtils.join(", ", tagsList));
                     }
-                });
 
-                if (!task.getResult().getBoolean("status"))
-                    holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
-                else
-                    holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+                    if (!task.getResult().getBoolean("status"))
+                        holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
+                    else
+                        holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
                 }
                 holder.viewProgressBarBackground.setVisibility(View.GONE);
                 holder.progressBar.setVisibility(View.GONE);
@@ -65,7 +64,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         });
     }
 
-    public void setOnProjectListener(RecyclerAdapterV2.OnProjectListener onProjectListener) {
+    public void setOnProjectListener(HomeRecyclerAdapter.OnProjectListener onProjectListener) {
         this.onProjectListener = onProjectListener;
     }
 
@@ -75,18 +74,24 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView textView_pCreator, textView_pTitle;
+        TextView textView_pTitle, textView_pSemesterAndYear, textView_pTags;
         View viewProgressBarBackground;
         ProgressBar progressBar;
         MaterialCardView materialCardViewProject;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.textView_pCreator = itemView.findViewById(R.id.textView_pCreator);
             this.textView_pTitle = itemView.findViewById(R.id.textView_pTitle);
+            this.textView_pSemesterAndYear = itemView.findViewById(R.id.textView_pSemesterAndYear);
+            this.textView_pTags = itemView.findViewById(R.id.textView_pTags);
             this.viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
             this.progressBar = itemView.findViewById(R.id.progressBar);
             materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+            textView_pTitle.setVisibility(View.VISIBLE);
+            textView_pSemesterAndYear.setVisibility(View.VISIBLE);
+            textView_pTags.setVisibility(View.VISIBLE);
+            itemView.findViewById(R.id.textView_pCreator).setVisibility(View.GONE);
+            itemView.findViewById(R.id.imageView_pCreator).setVisibility(View.GONE);
             itemView.setOnClickListener(this);
         }
 

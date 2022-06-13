@@ -11,7 +11,7 @@ public class Project {
     private String semester;
     private String year;
     private List<DocumentReference> supervisors;
-    private List<DocumentReference> supervisorsInvited;
+    private List<DocumentReference> supervisorsPending;
     private List<String> tags;
     private List<String> imagePaths;
     private List<DocumentReference> members;
@@ -78,11 +78,11 @@ public class Project {
         return status;
     }
 
-    public List<DocumentReference> getSupervisorsInvited() {
-        return supervisorsInvited;
+    public List<DocumentReference> getSupervisorsPending() {
+        return supervisorsPending;
     }
 
-    public void setSupervisorsInvited(List<DocumentReference> supervisorsInvited) {
-        this.supervisorsInvited = supervisorsInvited;
+    public void setSupervisorsPending(List<DocumentReference> supervisorsPending) {
+        this.supervisorsPending = supervisorsPending;
     }
 }

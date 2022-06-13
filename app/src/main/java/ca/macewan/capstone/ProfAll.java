@@ -39,6 +39,7 @@ public class ProfAll extends Fragment {
     private FirebaseFirestore db;
     private RecyclerAdapterV2 recyclerAdapterV2;
     ActivityResultLauncher<Intent> activityResultLauncher;
+    private View view;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +49,8 @@ public class ProfAll extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frag_invited, container, false);
+        view = inflater.inflate(R.layout.frag_invited, container, false);
+        return view;
     }
 
     @Override
@@ -88,24 +90,6 @@ public class ProfAll extends Fragment {
                         }
                     }
                 });
-//                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            recyclerAdapterV2 = new RecyclerAdapterV2((List<DocumentReference>) task.getResult().get("projects"));
-//                            recyclerView_Invited.setAdapter(recyclerAdapterV2);
-//                            recyclerView_Invited.setLayoutManager(new LinearLayoutManager(getActivity()));
-//                            recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
-//                                @Override
-//                                public void onProjectClick(int position, String projectPath) {
-//                                    Intent intent = new Intent(getContext(), ProjectInfoActivityProf.class);
-//                                    intent.putExtra("projectPath", projectPath);
-//                                    activityResultLauncher.launch(intent);
-//                                }
-//                            });
-//                        }
-//                    }
-//                });
     }
 
     private void refresh() {

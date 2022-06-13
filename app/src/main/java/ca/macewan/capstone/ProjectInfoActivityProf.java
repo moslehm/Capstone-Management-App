@@ -40,6 +40,7 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
 //    CheckBox checkBox_Status;
     String email;
     private DocumentReference projectRef;
+    private DocumentReference userRef;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,6 +58,7 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
 
         projectPath = getIntent().getExtras().getString("projectPath");
         projectRef = db.document(projectPath);
+        userRef = db.collection("Users").document(email);
         View projectView = findViewById(R.id.projectLayout);
         SharedMethods.setupProjectView(projectView, projectRef, email, this);
 
@@ -74,8 +76,8 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // remove the invitation from array
-                                db.collection("Users").document(email).update("invited",
-                                        FieldValue.arrayRemove(projectRef));
+                                userRef.update("invited", FieldValue.arrayRemove(projectRef));
+                                projectRef.update("supervisorsPending", userRef);
                                 refreshButtons();
                             }
                         })
@@ -96,49 +98,20 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                // remove supervisor from pending supervisors list
+                                projectRef.update("supervisorsPending", FieldValue.arrayRemove(userRef));
                                 // add prof to supervisor list
-                                projectRef.update("supervisors",
-                                        FieldValue.arrayUnion(db.collection("Users")
-                                                .document(email)));
+                                projectRef.update("supervisors", FieldValue.arrayUnion(userRef));
                                 // add request to accepted array
-                                db.collection("Users").document(email).update("projects",
-                                        FieldValue.arrayUnion(projectRef));
+                                userRef.update("projects", FieldValue.arrayUnion(projectRef));
                                 // remove request from invited array
-                                db.collection("Users").document(email).update("invited",
-                                        FieldValue.arrayRemove(projectRef));
+                                userRef.update("invited", FieldValue.arrayRemove(projectRef));
                                 refreshButtons();
                             }
                         })
                         .show();
             }
         });
-//        db.collection("Projects").document(projectID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                DocumentSnapshot documentSnapshot = task.getResult();
-//                if (documentSnapshot.exists()) {
-//                    List<DocumentReference> supervisorList = (ArrayList<DocumentReference>) documentSnapshot.get("supervisors");
-//                    List<DocumentReference> memberRefList = (ArrayList<DocumentReference>) documentSnapshot.get("members");
-//
-//                    DocumentReference creatorRef = documentSnapshot.getDocumentReference("creator");
-//                    creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                String creatorName = task.getResult().getString("name");
-//                                String creatorEmail = task.getResult().getString("email");
-//                                String creatorInfo = creatorName + " <" + creatorEmail + ">";
-////                                materialTextView_Creator.setContentText(creatorInfo, null);
-//                            }
-//                        }
-//                    });
-//
-//                    boolean status = documentSnapshot.getBoolean("status");
-//                    buttonAcceptSetUp(status, supervisorList);
-//                    buttonDeclineSetup(status, supervisorList);
-//                }
-//            }
-//        });
     }
 
     private void refreshButtons() {
@@ -161,12 +134,12 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
         if (!status)
             button_Decline.setEnabled(false);
         // already accepted the invitation
-        if (supervisorList != null && supervisorList.contains(db.collection("Users").document(email))) {
+        if (supervisorList != null && supervisorList.contains(userRef)) {
             button_Decline.setEnabled(false);
         }
 
         // disable the button for prof that was not invited to supervise
-        db.collection("Users").document(email).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -184,11 +157,11 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
         if (!status)
             button_Accept.setEnabled(false);
         // already accepted the invitation
-        if (supervisorList != null && supervisorList.contains(db.collection("Users").document(email))) {
+        if (supervisorList != null && supervisorList.contains(userRef)) {
             button_Accept.setEnabled(false);
         }
         // disable the button for prof that was not invited to supervisor
-        db.collection("Users").document(email).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {

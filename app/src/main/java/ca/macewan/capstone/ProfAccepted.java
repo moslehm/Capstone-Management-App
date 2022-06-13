@@ -33,6 +33,7 @@ public class ProfAccepted extends Fragment {
     private FirebaseFirestore db;
     private RecyclerAdapterV2 recyclerAdapterV2;
     ActivityResultLauncher<Intent> activityResultLauncher;
+    private View view;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,7 +43,8 @@ public class ProfAccepted extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.frag_accepted, container, false);
+        view = inflater.inflate(R.layout.frag_accepted, container, false);
+        return view;
     }
 
     @Override

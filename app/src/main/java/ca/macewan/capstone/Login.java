@@ -52,6 +52,8 @@ public class Login extends AppCompatActivity {
     private void logIn() {
         String username = editTextUsername.getText().toString();
         String password = editTextPassword.getText().toString();
+        editTextUsername.clearFocus();
+        editTextPassword.clearFocus();
 
         if (username.equals("") || password.equals("")) {
             Toast toast = Toast.makeText(getApplicationContext(),

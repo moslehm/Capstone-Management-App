@@ -85,9 +85,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             private void setupAllFragments() {
-                homeFragment = new HomeFragment(user);
+                Bundle bundle = new Bundle();
+                bundle.putString("email", user.email);
+
+                homeFragment = new HomeFragment();
+                homeFragment.setArguments(bundle);
                 if (Objects.equals(user.role, "student")) {
-                    listFragment = new ListFragment(user);
+                    listFragment = new ListFragment();
+                    listFragment.setArguments(bundle);
                 } else if (Objects.equals(user.role, "professor")) {
                     listFragment = new ProfListFragment();
                 }

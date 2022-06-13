@@ -17,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,23 +30,19 @@ import android.widget.Toast;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -58,21 +53,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Observer;
 
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
 
-
-public class ProposalCreationActivity extends AppCompatActivity {
+public class ProposalEditActivity extends AppCompatActivity {
     FirebaseFirestore db;
-    EditText editTextTitle, editTextDescription, editTextYear;
-    String selectedSemester;
-    ArrayList<User> arrayListSupervisors;
-    boolean[] selectedSupervisors;
-    ArrayList<Integer> supervisorList = new ArrayList<>();
-    private EditText editTextSupervisors, editTextKeyword;
-    public AlertDialog alertDialogSupervisor;
+    EditText editTextTitle, editTextDescription;
+    private EditText editTextKeyword;
     List<String> tags;
     private HorizontalScrollView scrollViewTags;
     private ChipGroup chipGroup;
@@ -81,32 +69,36 @@ public class ProposalCreationActivity extends AppCompatActivity {
     LinearLayout linearLayoutImages;
     private int downX;
     Button buttonSubmit;
-    private String userEmail;
+    private String projectPath;
+    private String email;
+    private DocumentReference projectRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_proposal_creation);
+        setContentView(R.layout.activity_proposal_edit);
 
         // Get action bar and show back button
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         db = FirebaseFirestore.getInstance();
-        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        projectPath = getIntent().getExtras().getString("projectPath");
+        email = getIntent().getExtras().getString("email");
+        projectRef = db.document(projectPath);
 
-        String[] semesters = {"Fall", "Winter", "Spring", "Summer"};
-        Spinner semestersSpinner = (Spinner) findViewById(R.id.spinnerSemester);
-        addSpinner(semestersSpinner, semesters, "Semester");
+        editTextTitle = (EditText) findViewById(R.id.editTextTitle);
+        editTextDescription = (EditText) findViewById(R.id.editTextDescription);
+        buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
 
-        setupSupervisors();
         setupTagChips();
         setupImageAttachment();
         setupSubmitButton();
+        fillExistingInfo();
     }
 
     private void setupSubmitButton() {
-        editTextTitle = (EditText) findViewById(R.id.editTextTitle);
         editTextTitle.addTextChangedListener (new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -122,7 +114,6 @@ public class ProposalCreationActivity extends AppCompatActivity {
             }
         });
 
-        editTextDescription = (EditText) findViewById(R.id.editTextDescription);
         editTextDescription.addTextChangedListener (new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -138,219 +129,23 @@ public class ProposalCreationActivity extends AppCompatActivity {
             }
         });
 
-        editTextYear = (EditText) findViewById(R.id.editTextYear);
-        editTextYear.addTextChangedListener (new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                checkRequiredFields();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
-        buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Setup Creator, Title, Description, semester, and supervisor values
-                DocumentReference creator =  db.collection("Users").document(userEmail);
-                String title = editTextTitle.getText().toString();
-                String description = editTextDescription.getText().toString();
-                String year = editTextYear.getText().toString();
-                Project project = new Project(creator, title, description, selectedSemester, year);
-
-                db.collection("Projects")
-                    .add(project)
-                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-                                DocumentReference projectRef = task.getResult();
-                                inviteSupervisors(projectRef);
-                                creator.update("projects", FieldValue.arrayUnion(projectRef));
-                                projectRef.update("tags", tags);
-                                if (linearLayoutImages.getChildCount() - 1 == 0) {
-                                    finish();
-                                }
-                                uploadImages(projectRef);
-                            }
-                        }
-
-                        private void uploadImages(DocumentReference projectRef) {
-                            String projectID = projectRef.getId();
-                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                            StorageReference imageRef = null;
-                            List<UploadTask> myTasks = new ArrayList<>();
-                            for (int i = 0; i < linearLayoutImages.getChildCount() - 1; i++) {
-                                DeletableImageView image = (DeletableImageView) linearLayoutImages.getChildAt(i);
-                                imageRef = storageRef.child("project_images/" + projectID + "/" + image.getUri().getLastPathSegment());
-                                InputStream stream = null;
-                                try {
-                                    stream = new FileInputStream(image.getUri().getPath());
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                                myTasks.add(imageRef.putStream(stream));
-                            }
-                            Tasks.whenAllSuccess(myTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
-                                @Override
-                                public void onSuccess(List<Object> objects) {
-                                    List<Task<Uri>> tasks = new ArrayList<Task<Uri>>();
-                                    for (Object object : objects) {
-                                        UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) object;
-                                        tasks.add(snapshot.getMetadata().getReference().getDownloadUrl());
-                                    }
-                                    Tasks.whenAllSuccess(tasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
-                                        @Override
-                                        public void onSuccess(List<Object> objects) {
-                                            List<String> imagePaths = new ArrayList<String>();
-                                            for (Object object : objects) {
-                                                Uri uri = (Uri) object;
-                                                imagePaths.add(uri.toString());
-                                                finish();
-                                            }
-                                            projectRef.update("imagePaths", imagePaths);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
+                projectRef.update("name", editTextTitle.getText().toString());
+                projectRef.update("description", editTextDescription.getText().toString());
+                projectRef.update("tags", tags);
+                finish();
             }
         });
-    }
-
-    private void inviteSupervisors(DocumentReference projectRef) {
-       for (int i = 0; i < arrayListSupervisors.size(); i++) {
-            if (selectedSupervisors[i]) {
-                String supervisorEmail = arrayListSupervisors.get(i).email;
-                DocumentReference supervisor = db.collection("Users").document(supervisorEmail);
-                if (supervisorEmail.equals(userEmail)) {
-                    supervisor.update("projects", FieldValue.arrayUnion(projectRef));
-                    projectRef.update("supervisors", FieldValue.arrayUnion(supervisor));
-                    continue;
-                }
-                supervisor.update("invited", FieldValue.arrayUnion(projectRef));
-                projectRef.update("supervisorsPending", FieldValue.arrayUnion(supervisor));
-            }
-        }
     }
 
     private void checkRequiredFields() {
         boolean titleEmpty = editTextTitle.getText().toString().isEmpty();
         boolean descriptionEmpty = editTextDescription.getText().toString().isEmpty();
-        boolean semesterChosen = selectedSemester != null;
-        boolean yearEmpty = editTextYear.getText().toString().isEmpty();
-        boolean supervisorsChosen = anySupervisorsSelected();
-        buttonSubmit.setEnabled(!titleEmpty && !descriptionEmpty && semesterChosen && !yearEmpty && supervisorsChosen);
+        buttonSubmit.setEnabled(!titleEmpty && !descriptionEmpty);
     }
 
-    public boolean anySupervisorsSelected() {
-        for (boolean val : selectedSupervisors) {
-            if (val)
-                return true;
-        }
-        return false;
-    }
-
-    private void setupSupervisors() {
-        arrayListSupervisors = new ArrayList<User>();
-        db.collection("Users")
-                .whereEqualTo("role", "professor")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                arrayListSupervisors.add(document.toObject(User.class));
-                            }
-                            populateAlertDialog();
-                        }
-                    }
-                });
-    }
-
-    private void populateAlertDialog() {
-        String[] supervisors = new String[arrayListSupervisors.size()];
-        for (int i = 0; i < arrayListSupervisors.size(); i++){
-            supervisors[i] = arrayListSupervisors.get(i).name;
-        }
-        editTextSupervisors = findViewById(R.id.editTextSupervisors);
-        selectedSupervisors = new boolean[supervisors.length];
-
-        editTextSupervisors.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (alertDialogSupervisor != null && alertDialogSupervisor.isShowing()) return;
-
-                // Close keyboard if open
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-                // Initialize alert dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(ProposalCreationActivity.this);
-                builder.setTitle("Supervisor(s)");
-                builder.setCancelable(false);
-                builder.setMultiChoiceItems(supervisors, selectedSupervisors, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i, boolean boxChecked) {
-                        if (boxChecked) {
-                            supervisorList.add(i);
-                            Collections.sort(supervisorList);
-                        } else {
-                            supervisorList.remove(Integer.valueOf(i));
-                        }
-                        checkRequiredFields();
-                    }
-                });
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // Put supervisor names together for the EditText
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (int j = 0; j < supervisorList.size(); j++) {
-                            stringBuilder.append(supervisors[supervisorList.get(j)]);
-                            if (j != supervisorList.size() - 1) {
-                                stringBuilder.append(", ");
-                            }
-                        }
-                        editTextSupervisors.setText(stringBuilder.toString());
-                    }
-                });
-                alertDialogSupervisor = builder.show();
-            }
-        });
-    }
-
-
-    private void addSpinner(Spinner spinner, String[] stringArray, String hint) {
-        HintSpinner<String> hintSpinner = new HintSpinner<String>(
-                spinner,
-                new HintAdapter<String>(this, hint, Arrays.asList(stringArray)),
-                new HintSpinner.Callback<String>() {
-                    @Override
-                    public void onItemSelected(int position, String itemAtPosition) {
-                        // Semester selected here
-                        selectedSemester = itemAtPosition;
-                        checkRequiredFields();
-                    }
-                });
-        View spinnerOverlay = findViewById(R.id.spinner_overlay);
-        spinnerOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                spinner.performClick();
-            }
-        });
-        hintSpinner.init();
-    }
 
     private void setupTagChips() {
         tags = new ArrayList<String>();
@@ -374,7 +169,8 @@ public class ProposalCreationActivity extends AppCompatActivity {
         });
         editTextKeyword.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                addNewChip();
+                String keyword = editTextKeyword.getText().toString();
+                addNewChip(keyword);
                 return true;
             }
             return false;
@@ -382,13 +178,13 @@ public class ProposalCreationActivity extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addNewChip();
+                String keyword = editTextKeyword.getText().toString();
+                addNewChip(keyword);
             }
         });
     }
 
-    private void addNewChip() {
-        String keyword = this.editTextKeyword.getText().toString();
+    private void addNewChip(String keyword) {
         if (keyword.isEmpty()) {
             return;
         }
@@ -428,18 +224,39 @@ public class ProposalCreationActivity extends AppCompatActivity {
         buttonAttachImage = (ImageButton) findViewById(R.id.buttonAttachImage);
         buttonAttachImage.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ImagePicker.create(ProposalCreationActivity.this).start();
+                ImagePicker.create(ProposalEditActivity.this).start();
             }
         });
         ImageButton buttonAttachImage2 = (ImageButton) findViewById(R.id.buttonAttachImage2);
         buttonAttachImage2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ImagePicker.create(ProposalCreationActivity.this).start();
+                ImagePicker.create(ProposalEditActivity.this).start();
             }
         });
 
         linearLayoutImages = (LinearLayout) findViewById(R.id.linearLayoutImages);
         scrollViewImages = (HorizontalScrollView) findViewById(R.id.scrollViewImages);
+    }
+
+    private void fillExistingInfo() {
+        projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        editTextTitle.setText(snapshot.getString("name"));
+                        editTextDescription.setText(snapshot.getString("description"));
+                        Object tagsObject = snapshot.get("tags");
+                        if (tagsObject == null) {
+                            return;
+                        }
+                        ArrayList<String> tagsList = (ArrayList<String>) tagsObject;
+                        for (String tag : tagsList) {
+                            addNewChip(tag);
+                        }
+                    }
+                }
+            });
     }
 
     @Override
@@ -514,9 +331,10 @@ public class ProposalCreationActivity extends AppCompatActivity {
     public float dpToPx(final float dp) {
         return dp * this.getResources().getDisplayMetrics().density;
     }
-
     // Makes EditTexts lose focus when appropriate
+
     // Reference: https://stackoverflow.com/a/61290481
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -561,7 +379,6 @@ public class ProposalCreationActivity extends AppCompatActivity {
         }
         return super.dispatchTouchEvent(event);
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {
