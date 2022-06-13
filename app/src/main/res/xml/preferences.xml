@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Notifications">
+
+    </PreferenceCategory>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="prefNotificationMaster"
+        android:title="Enable Notifications" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:summary="Notify when someone requests to join project"
+        android:dependency="prefNotificationMaster"
+        android:title="On project join" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="check_box_preference_2"
+        android:summary="Notify when a supervisor agrees to supervise the project"
+        android:dependency="prefNotificationMaster"
+        android:title="On supervisor accept" />
+    <PreferenceCategory android:title="Security">
+
+    </PreferenceCategory>
+    <EditTextPreference
+        android:defaultValue="Default value"
+        android:key="edit_text_preference_1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Change Password" />
+</PreferenceScreen>

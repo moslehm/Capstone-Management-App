@@ -1,5 +1,6 @@
 package ca.macewan.capstone;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +32,8 @@ public class SettingsFragment extends Fragment {
     public SettingsFragment() {
         // Required empty public constructor
     }
+
+    private TextView textProfile, textPreferences, textHelp, textAbout, textSignout;
 
     /**
      * Use this factory method to create a new instance of
@@ -60,5 +67,58 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        textProfile = getView().findViewById(R.id.settingsProfile);
+        textPreferences = getView().findViewById(R.id.settingsPreferences);
+        textHelp = getView().findViewById(R.id.settingsHelp);
+        textAbout = getView().findViewById(R.id.settingsAbout);
+        textSignout = getView().findViewById(R.id.settingsSignOut);
+
+        textProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        textPreferences.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        textHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Clicked Help!",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        textAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Clicked About!",
+                        Toast.LENGTH_SHORT);
+            }
+        });
+
+        textSignout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Signing Out!",
+                        Toast.LENGTH_SHORT);
+
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getActivity(), Login.class));
+            }
+        });
     }
 }
