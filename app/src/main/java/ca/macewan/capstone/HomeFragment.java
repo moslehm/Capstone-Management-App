@@ -159,9 +159,9 @@ public class HomeFragment extends Fragment {
         recyclerView_Accepted.setLayoutManager(new LinearLayoutManager(getActivity()));
         homeRecyclerAdapter.setOnProjectListener(new HomeRecyclerAdapter.OnProjectListener() {
             @Override
-            public void onProjectClick(int position, String projectPath) {
+            public void onProjectClick(int position, String projectID) {
                 Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
-                intent.putExtra("projectPath", projectPath);
+                intent.putExtra("projectID", projectID);
                 startActivity(intent);
             }
         });
@@ -223,7 +223,7 @@ public class HomeFragment extends Fragment {
         DocumentReference userRef = db.collection("Users").document(email);
         if (id == R.id.action_edit) {
             Intent intent = new Intent(getContext(), ProposalEditActivity.class);
-            intent.putExtra("projectPath", projectRef.getPath());
+            intent.putExtra("projectID", projectRef.getId());
             intent.putExtra("email", email);
             startActivity(intent);
         } else if (id == R.id.action_quit) {

@@ -98,11 +98,11 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
         @Override
         public void onClick(View v) {
             onProjectListener.onProjectClick(getBindingAdapterPosition(),
-                    documentReferenceList.get(getBindingAdapterPosition()).getPath());
+                    documentReferenceList.get(getBindingAdapterPosition()).getId());
         }
     }
 
     public interface OnProjectListener {
-        void onProjectClick(int position, String projectPath);
+        void onProjectClick(int position, String projectID);
     }
 }

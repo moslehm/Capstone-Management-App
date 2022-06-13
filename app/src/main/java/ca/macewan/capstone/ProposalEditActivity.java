@@ -69,7 +69,7 @@ public class ProposalEditActivity extends AppCompatActivity {
     LinearLayout linearLayoutImages;
     private int downX;
     Button buttonSubmit;
-    private String projectPath;
+    private String projectID;
     private String email;
     private DocumentReference projectRef;
 
@@ -84,9 +84,9 @@ public class ProposalEditActivity extends AppCompatActivity {
 
 
         db = FirebaseFirestore.getInstance();
-        projectPath = getIntent().getExtras().getString("projectPath");
+        projectID = getIntent().getExtras().getString("projectID");
         email = getIntent().getExtras().getString("email");
-        projectRef = db.document(projectPath);
+        projectRef = db.collection("Projects").document(projectID);
 
         editTextTitle = (EditText) findViewById(R.id.editTextTitle);
         editTextDescription = (EditText) findViewById(R.id.editTextDescription);

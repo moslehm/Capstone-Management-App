@@ -23,7 +23,7 @@ import ca.macewan.capstone.adapter.SharedMethods;
 
 public class ProjectInformationActivity extends AppCompatActivity {
     FirebaseFirestore db;
-    String projectPath;
+    String projectID;
     DocumentReference projectRef;
     List<DocumentReference> memberRefList;
     String email;
@@ -33,15 +33,21 @@ public class ProjectInformationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Get action bar and show back button
+        assert getSupportActionBar() != null;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         setContentView(R.layout.activity_project_information);
         db = FirebaseFirestore.getInstance();
         email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
         setUp();
     }
 
     private void setUp() {
-        projectPath = getIntent().getExtras().getString("projectPath");
-        projectRef = db.document(projectPath);
+        projectID = getIntent().getExtras().getString("projectID");
+        projectRef = db.collection("Projects").document(projectID);
         userRef = db.collection("Users").document(email);
         View projectView = findViewById(R.id.projectLayout);
         SharedMethods.setupProjectView(projectView, projectRef, email, this);
@@ -119,7 +125,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_edit) {
             Intent intent = new Intent(getApplicationContext(), ProposalEditActivity.class);
-            intent.putExtra("projectPath", projectPath);
+            intent.putExtra("projectID", projectID);
             intent.putExtra("email", email);
             startActivity(intent);
         } else if (id == R.id.action_quit) {
@@ -145,5 +151,11 @@ public class ProjectInformationActivity extends AppCompatActivity {
             });
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

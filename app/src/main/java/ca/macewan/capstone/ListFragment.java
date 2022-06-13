@@ -41,13 +41,11 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     private TextView textViewRole, textViewName;
     private RecyclerView recyclerViewProject;
     private RecyclerAdapter recyclerAdapter;
-    private User user;
     private SearchView searchView;
     private CheckBox checkBox_Term, checkBox_Desc;
     private FirebaseFirestore db;
 
-    public ListFragment(User user) {
-        this.user = user;
+    public ListFragment() {
     }
 
     @Override
@@ -95,7 +93,7 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
 
     @Override
     public void onProjectClick(int position, String projectID) {
-        Intent intent = new Intent(getContext(), ProjectInfoActivity.class);
+        Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
         intent.putExtra("projectID", projectID);
         startActivity(intent);
     }
@@ -180,7 +178,7 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
                                                 recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
                                                     @Override
                                                     public void onProjectClick(int position, String projectID) {
-                                                        Intent intent = new Intent(getContext(), ProjectInfoActivity.class);
+                                                        Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
                                                         intent.putExtra("projectID", projectID);
                                                         startActivity(intent);
                                                     }
@@ -215,7 +213,7 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
                     recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
                         @Override
                         public void onProjectClick(int position, String projectID) {
-                            Intent intent = new Intent(getContext(), ProjectInfoActivity.class);
+                            Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
                             intent.putExtra("projectID", projectID);
                             startActivity(intent);
                         }
