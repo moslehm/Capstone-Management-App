@@ -35,12 +35,12 @@
         android:gravity="center"
         android:text="@string/preferences"
         android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_settings"
+        app:drawableTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsProfile"
-        app:drawableTint="@color/black"
-        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
-        app:drawableStartCompat="@drawable/ic_settings" />
+        app:layout_constraintTop_toBottomOf="@+id/settingsProfile" />
 
     <TextView
         android:id="@+id/settingsText"
@@ -62,12 +62,12 @@
         android:gravity="center"
         android:text="@string/help_and_support"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsPreferences"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
         app:drawableStartCompat="@drawable/ic_baseline_help_outline_24"
         app:drawableTint="@color/black"
-        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsPreferences" />
 
     <TextView
         android:id="@+id/settingsSignOut"
@@ -95,11 +95,11 @@
         android:gravity="center"
         android:text="@string/about"
         android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_outline_info_24"
+        app:drawableTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsHelp"
-        app:drawableTint="@color/black"
-        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
-        app:drawableStartCompat="@drawable/ic_outline_info_24" />
+        app:layout_constraintTop_toBottomOf="@+id/settingsHelp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

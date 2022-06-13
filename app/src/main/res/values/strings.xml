@@ -42,5 +42,10 @@
     <string name="help_and_support">Help and Support</string>
     <string name="about">About</string>
     <string name="sign_out">Sign Out</string>
+    <string name="account_information">Account Information</string>
+    <string name="change_password">Change Password</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="account_management">Account Management</string>
+    <string name="disable_account">Disable Account</string>
 
 </resources>

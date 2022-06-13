@@ -39,15 +39,15 @@
         android:text="@string/Full_Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePersonal" />
+        app:layout_constraintTop_toBottomOf="@+id/profileInfo" />
 
     <TextView
-        android:id="@+id/profilePersonal"
+        android:id="@+id/profileInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/Personal_Info"
-        android:textSize="20sp"
+        android:text="@string/account_information"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.452"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,19 +81,53 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileEmail" />
 
-    <EditText
-        android:id="@+id/profilePassword"
+    <TextView
+        android:id="@+id/profileManagement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:autofillHints="@string/Password"
-        android:ems="10"
-        android:hint="@string/Password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:textColorHint="#757575"
+        android:text="@string/account_management"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profilePhone" />
+
+    <TextView
+        android:id="@+id/profileDisable"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:text="@string/disable_account"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profilePassword" />
+
+    <TextView
+        android:id="@+id/profileDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:text="@string/delete_account"
+        android:textColor="@android:color/red"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileDisable" />
+
+    <TextView
+        android:id="@+id/profilePassword"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/change_password"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileManagement" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
