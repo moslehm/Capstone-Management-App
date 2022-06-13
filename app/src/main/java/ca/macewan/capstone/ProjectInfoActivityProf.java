@@ -34,7 +34,7 @@ import uk.co.onemandan.materialtextview.MaterialTextView;
 public class ProjectInfoActivityProf extends AppCompatActivity {
     Button button_Accept, button_Decline;
     FirebaseFirestore db;
-    String projectPath;
+    String projectID;
 //    MaterialTextView materialTextView_Creator, materialTextView_Title, materialTextView_Supervisor,
 //            materialTextView_Members, materialTextView_Description;
 //    CheckBox checkBox_Status;
@@ -55,8 +55,8 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
         button_Accept = findViewById(R.id.button_Accept);
         button_Decline = findViewById(R.id.button_Decline);
 
-        projectPath = getIntent().getExtras().getString("projectPath");
-        projectRef = db.document(projectPath);
+        projectID = getIntent().getExtras().getString("projectID");
+        projectRef = db.collection("Projects").document(projectID);
         View projectView = findViewById(R.id.projectLayout);
         SharedMethods.setupProjectView(projectView, projectRef, email, this);
 
@@ -106,6 +106,9 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
                                 // remove request from invited array
                                 db.collection("Users").document(email).update("invited",
                                         FieldValue.arrayRemove(projectRef));
+                                projectRef.update("supervisorsPending",
+                                        FieldValue.arrayRemove(db.collection("Users")
+                                                .document(email)));
                                 refreshButtons();
                             }
                         })

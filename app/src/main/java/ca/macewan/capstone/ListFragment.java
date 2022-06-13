@@ -2,12 +2,6 @@ package ca.macewan.capstone;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,21 +9,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.SearchView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import ca.macewan.capstone.adapter.RecyclerAdapter;
+import ca.macewan.capstone.adapter.RecyclerAdapterV2;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +44,7 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     private User user;
     private SearchView searchView;
     private CheckBox checkBox_Term, checkBox_Desc;
+    private FirebaseFirestore db;
 
     public ListFragment(User user) {
         this.user = user;
@@ -64,17 +66,10 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
-        checkBox_Desc = getView().findViewById(R.id.checkBox_Desc);
-        checkBox_Term = getView().findViewById(R.id.checkBox_Term);
-
         setUp();
     }
 
     public void setUp() {
-        // This will display all the current projects in our database
-        checkBox_Term.setVisibility(View.GONE);
-        checkBox_Desc.setVisibility(View.GONE);
-
         Query query = FirebaseFirestore.getInstance().collection("Projects");
         FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
                 .setQuery(query, Project.class)
@@ -128,17 +123,15 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkBox_Term.setVisibility(View.VISIBLE);
-                checkBox_Desc.setVisibility(View.VISIBLE);
+//                checkBox_Term.setVisibility(View.VISIBLE);
+//                checkBox_Desc.setVisibility(View.VISIBLE);
 
-                checkBoxSetUp();
+//                checkBoxSetUp();
             }
         });
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                checkBox_Term.setVisibility(View.GONE);
-                checkBox_Desc.setVisibility(View.GONE);
                 recyclerAdapter.stopListening();
 
                 Query query = FirebaseFirestore.getInstance().collection("Projects");
@@ -156,47 +149,80 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void checkBoxSetUp() {
-        checkBox_Desc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkBox_Term.setEnabled(!checkBox_Desc.isChecked());
-            }
-        });
 
-        checkBox_Term.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkBox_Desc.setEnabled(!checkBox_Term.isChecked());
-            }
-        });
-    }
-
-    // prefix search only
+    // not ideal for large dataset
     private void search(String term) {
-        Query query = null;
-        if (checkBox_Term.isChecked()) {
-            recyclerAdapter.stopListening();
-            query = FirebaseFirestore.getInstance().collection("Projects")
-                    .whereLessThanOrEqualTo("semester", term + '\uf8ff')
-                    .whereGreaterThanOrEqualTo("semester", term);
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+        db = FirebaseFirestore.getInstance();
+        db.collection("Projects").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<DocumentReference> documentReferenceList = new ArrayList<>();
+                    ArrayList<DocumentSnapshot> documentSnapshotList = new ArrayList<>();
                     QuerySnapshot querySnapshot = task.getResult();
-                    System.out.println(querySnapshot.size());
-                }
-            });
-        }
+                    for (DocumentSnapshot ds : querySnapshot) {
+                        documentSnapshotList.add(ds);
+                    }
+                    for (DocumentSnapshot ds : documentSnapshotList) {
+                        String temp = null;
+                        List<DocumentReference> profList = (List<DocumentReference>) ds.get("supervisors");
+                        if (profList != null) {
+                            for (DocumentReference prof : profList) {
+                                prof.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            if (task.getResult().getString("name").contains(term) &&
+                                                    !documentReferenceList.contains(ds.getReference())) {
+                                                documentReferenceList.add(ds.getReference());
+                                                RecyclerAdapterV2 recyclerAdapterV2 = new RecyclerAdapterV2(documentReferenceList);
+                                                recyclerViewProject.setAdapter(recyclerAdapterV2);
+                                                recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
+                                                    @Override
+                                                    public void onProjectClick(int position, String projectID) {
+                                                        Intent intent = new Intent(getContext(), ProjectInfoActivity.class);
+                                                        intent.putExtra("projectID", projectID);
+                                                        startActivity(intent);
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
 
-            FirestoreRecyclerOptions<Project> newOptions = new FirestoreRecyclerOptions.Builder<Project>()
-                    .setQuery(query, Project.class)
-                    .build();
-            recyclerAdapter = new RecyclerAdapter(newOptions);
-            recyclerViewProject.setAdapter(recyclerAdapter);
-            recyclerAdapter.setOnProjectListener(this);
-            recyclerViewProject.setItemAnimator(null);
-            recyclerAdapter.startListening();
+                        List<String> tagList = (List<String>) ds.get("tags");
+                        if (tagList != null) {
+                            for (String tag : tagList) {
+                                if (tag.contains(term) && !documentReferenceList.contains(ds.getReference()))
+                                    documentReferenceList.add(ds.getReference());
+                            }
+                        }
+
+                        temp += ds.getString("semester") + " ";
+                        temp += ds.getString("year") + " ";
+                        temp += ds.getString("description") + " ";
+                        temp += ds.getString("name") + " ";
+
+                        if (temp.contains(term) && !documentReferenceList.contains(ds.getReference())) {
+                            documentReferenceList.add(ds.getReference());
+                        }
+                    }
+                    recyclerAdapter.stopListening();
+                    RecyclerAdapterV2 recyclerAdapterV2 = new RecyclerAdapterV2(documentReferenceList);
+                    recyclerViewProject.setAdapter(recyclerAdapterV2);
+                    recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
+                        @Override
+                        public void onProjectClick(int position, String projectID) {
+                            Intent intent = new Intent(getContext(), ProjectInfoActivity.class);
+                            intent.putExtra("projectID", projectID);
+                            startActivity(intent);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
