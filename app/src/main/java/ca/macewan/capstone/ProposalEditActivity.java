@@ -80,6 +80,7 @@ public class ProposalEditActivity extends AppCompatActivity {
 
         // Get action bar and show back button
         assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle("Edit Project");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 

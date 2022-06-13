@@ -36,6 +36,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
 
         // Get action bar and show back button
         assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle("Project Information");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setContentView(R.layout.activity_project_information);

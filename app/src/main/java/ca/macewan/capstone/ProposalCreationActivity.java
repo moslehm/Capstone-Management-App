@@ -90,6 +90,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
 
         // Get action bar and show back button
         assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle("Create Project");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         db = FirebaseFirestore.getInstance();
