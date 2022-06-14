@@ -46,5 +46,10 @@
     <string name="delete_account">Delete Account</string>
     <string name="account_management">Account Management</string>
     <string name="disable_account">Disable Account</string>
+    <string name="availability">Availability</string>
+    <string name="fall">Fall</string>
+    <string name="spring">Spring</string>
+    <string name="winter">Winter</string>
+    <string name="summer">Summer</string>
 
 </resources>

@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -33,7 +34,8 @@ import java.util.Map;
 public class ProfileActivity extends AppCompatActivity {
     ImageView profile;
     EditText editName, editEmail, editPhone;
-    TextView changePassword, role;
+    TextView changePassword, role, profAvail;
+    ChipGroup profAvailChips;
     Menu menu;
     DocumentReference user;
 
@@ -48,6 +50,10 @@ public class ProfileActivity extends AppCompatActivity {
         editName = findViewById(R.id.profileName);
         editEmail = findViewById(R.id.profileEmail);
         editPhone = findViewById(R.id.profilePhone);
+
+        profAvail = findViewById(R.id.profileProfAvail);
+        profAvailChips = findViewById(R.id.profileProfAvailChips);
+
         changePassword = findViewById(R.id.profilePassword);
         ImageView img= findViewById(R.id.imageView);
         img.setImageResource(R.drawable.ic_baseline_person_24);
@@ -59,10 +65,16 @@ public class ProfileActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
                         User user = task.getResult().toObject(User.class);
+
                         role.setText(user.role);
                         editName.setText(user.name);
                         editEmail.setText(user.email);
                         editPhone.setText(user.phone);
+
+                        if (user.role.equals("professor")) {
+                            profAvail.setVisibility(View.VISIBLE);
+                            profAvailChips.setVisibility(View.VISIBLE);
+                        }
                     } else {
                         return;
                     }

@@ -14,6 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileRole"
+        tools:ignore="ImageContrastCheck"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -93,7 +94,7 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePhone" />
+        app:layout_constraintTop_toBottomOf="@+id/profileProfAvailChips" />
 
     <TextView
         android:id="@+id/profileDisable"
@@ -149,5 +150,56 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/profileProfAvail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/availability"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profilePhone" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/profileProfAvailChips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileProfAvail"
+        app:singleSelection="false">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/profileFallChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/fall" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/profileWinterChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/winter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/profileSpringChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/spring" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/profileSummerChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/summer" />
+    </com.google.android.material.chip.ChipGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
