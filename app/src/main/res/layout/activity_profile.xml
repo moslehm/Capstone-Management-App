@@ -9,11 +9,11 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="@string/User_Photo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileRole"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -33,8 +33,9 @@
         android:layout_marginTop="8dp"
         android:autofillHints="@string/Full_Name"
         android:ems="10"
+        android:enabled="false"
         android:hint="@string/Full_Name"
-        android:inputType="textPersonName"
+        android:inputType="none"
         android:minHeight="48dp"
         android:text="@string/Full_Name"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +61,8 @@
         android:layout_marginTop="16dp"
         android:autofillHints="@string/Email"
         android:ems="10"
-        android:inputType="textWebEmailAddress|textEmailAddress"
+        android:enabled="false"
+        android:inputType="none"
         android:minHeight="48dp"
         android:text="@string/Email"
         app:layout_constraintEnd_toEndOf="parent"
@@ -74,7 +76,8 @@
         android:layout_marginTop="16dp"
         android:autofillHints="@string/Phone_Number"
         android:ems="10"
-        android:inputType="phone"
+        android:enabled="false"
+        android:inputType="none"
         android:minHeight="48dp"
         android:text="@string/Phone_Number"
         app:layout_constraintEnd_toEndOf="parent"
@@ -85,6 +88,7 @@
         android:id="@+id/profileManagement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="@string/account_management"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -93,8 +97,9 @@
 
     <TextView
         android:id="@+id/profileDisable"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:text="@string/disable_account"
         android:textSize="20sp"
@@ -105,8 +110,9 @@
 
     <TextView
         android:id="@+id/profileDelete"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:text="@string/delete_account"
         android:textColor="@color/design_default_color_error"
@@ -120,6 +126,7 @@
         android:id="@+id/profilePassword"
         android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -129,5 +136,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileManagement" />
+
+    <TextView
+        android:id="@+id/profileRole"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
