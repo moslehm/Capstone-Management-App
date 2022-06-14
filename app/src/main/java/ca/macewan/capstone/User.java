@@ -3,7 +3,6 @@ package ca.macewan.capstone;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 
-import java.io.Serializable;
 import java.util.List;
 
 @IgnoreExtraProperties
@@ -11,6 +10,7 @@ public class User {
     public String email;
     public String name;
     public String role;
+    public String phone;
     public List<DocumentReference> projects;
 
     public User() {
@@ -23,4 +23,10 @@ public class User {
         this.role = role;
     }
 
+    public User(String email, String name, String role, String phone) {
+        this.email = email;
+        this.name = name;
+        this.role = role;
+        this.phone = phone;
+    }
 }
