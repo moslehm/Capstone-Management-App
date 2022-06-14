@@ -14,12 +14,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.api.Distribution;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -76,9 +78,13 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
                 .build();
         recyclerAdapter = new RecyclerAdapter(options);
         recyclerViewProject.setAdapter(recyclerAdapter);
-        recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerViewProject.setLayoutManager(linearLayoutManager);
         recyclerAdapter.setOnProjectListener(this);
         recyclerViewProject.setItemAnimator(null);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewProject.getContext(),
+                linearLayoutManager.getOrientation());
+        recyclerViewProject.addItemDecoration(dividerItemDecoration);
     }
 
     @Override
@@ -133,7 +139,6 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
             @Override
             public boolean onClose() {
                 recyclerAdapter.stopListening();
-
                 Query query = FirebaseFirestore.getInstance().collection("Projects");
                 FirestoreRecyclerOptions<Project> options = new FirestoreRecyclerOptions.Builder<Project>()
                         .setQuery(query, Project.class)
@@ -141,7 +146,6 @@ public class ListFragment extends Fragment implements RecyclerAdapter.OnProjectL
                 recyclerAdapter = new RecyclerAdapter(options);
                 recyclerViewProject.setAdapter(recyclerAdapter);
                 recyclerAdapter.setOnProjectListener(ListFragment.this);
-                recyclerViewProject.setItemAnimator(null);
                 recyclerAdapter.startListening();
                 return false;
             }

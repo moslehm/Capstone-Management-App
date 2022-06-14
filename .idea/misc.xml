@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_baseline_closed.xml" value="0.127" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_baseline_closed_red.xml" value="0.127" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_baseline_open.xml" value="0.127" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_baseline_open_green.xml" value="0.127" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.127" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_list.xml" value="0.1" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_outline_email.xml" value="0.2415" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/drawable/ic_outline_search_24.xml" value="0.1" />
@@ -20,9 +25,11 @@
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_available.xml" value="0.4239583333333333" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_invited.xml" value="0.2066869300911854" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/frag_prof.xml" value="0.425" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/fragment_home.xml" value="0.23233695652173914" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/fragment_list.xml" value="0.425" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/layout_entry_chip.xml" value="0.425" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/login.xml" value="0.41938405797101447" />
+        <entry key="..\:/GitHub/Project496/app/src/main/res/layout/project_information.xml" value="0.425" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/layout/project_item.xml" value="0.41938405797101447" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/menu/menu_options.xml" value="0.5" />
         <entry key="..\:/GitHub/Project496/app/src/main/res/menu/nav_menu.xml" value="0.425" />

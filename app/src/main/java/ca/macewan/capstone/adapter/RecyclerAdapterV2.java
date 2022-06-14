@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -54,9 +55,9 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                 });
 
                 if (!task.getResult().getBoolean("status"))
-                    holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
+                    holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
                 else
-                    holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+                    holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
                 }
             }
         });
@@ -73,13 +74,13 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView textView_pCreator, textView_pTitle;
-        MaterialCardView materialCardViewProject;
+        ImageView imageView_status;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.textView_pCreator = itemView.findViewById(R.id.textView_pCreator);
             this.textView_pTitle = itemView.findViewById(R.id.textView_pTitle);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+            this.imageView_status = itemView.findViewById(R.id.imageView_status);
             itemView.setOnClickListener(this);
         }
 

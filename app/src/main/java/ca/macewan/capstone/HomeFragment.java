@@ -20,6 +20,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -79,6 +80,7 @@ public class HomeFragment extends Fragment {
         });
         recyclerAdapterV2 = new RecyclerAdapterV2(user.projects);
         recyclerView_Accepted.setAdapter(recyclerAdapterV2);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView_Accepted.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
             @Override
@@ -108,6 +110,9 @@ public class HomeFragment extends Fragment {
 //                        }
 //                    }
 //                });
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView_Accepted.getContext(),
+                linearLayoutManager.getOrientation());
+        recyclerView_Accepted.addItemDecoration(dividerItemDecoration);
 
         return view;
     }
@@ -195,9 +200,9 @@ public class HomeFragment extends Fragment {
             recyclerView_Accepted.setAdapter(recyclerAdapterV2);
             recyclerAdapterV2.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
                 @Override
-                public void onProjectClick(int position, String projectPath) {
+                public void onProjectClick(int position, String projectID) {
                     Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
-                    intent.putExtra("projectPath", projectPath);
+                    intent.putExtra("projectID", projectID);
                     activityResultLauncher.launch(intent);
                 }
             });
