@@ -211,7 +211,7 @@ public class HomeFragment extends Fragment {
                 System.out.println("updating view");
                 updateView();
                 updateNeeded = false;
-            } else if (user.projects.size() == 1 && prevSize == 1)
+            } else if (user.projects != null && user.projects.size() == 1 && prevSize == 1)
                 enableMenuButtons(user.projects.get(0));
         }
     }

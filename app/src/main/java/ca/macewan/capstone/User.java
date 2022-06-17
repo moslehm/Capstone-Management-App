@@ -11,6 +11,7 @@ public class User {
     public String name;
     public String role;
     public String phone;
+    public String picture;
     public List<DocumentReference> projects;
 
     public User() {
