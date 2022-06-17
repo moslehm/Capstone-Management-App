@@ -144,7 +144,7 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     List<DocumentReference> invitedProjList = (List<DocumentReference>) task.getResult().get("invited");
-                    if (!invitedProjList.contains(projectRef)) {
+                    if (invitedProjList != null && !invitedProjList.contains(projectRef)) {
                         button_Decline.setEnabled(false);
                     }
                 }
@@ -166,7 +166,7 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     List<DocumentReference> invitedProjList = (List<DocumentReference>) task.getResult().get("invited");
-                    if (!invitedProjList.contains(projectRef)) {
+                    if (invitedProjList != null && !invitedProjList.contains(projectRef)) {
                         button_Accept.setEnabled(false);
                     }
                 }
