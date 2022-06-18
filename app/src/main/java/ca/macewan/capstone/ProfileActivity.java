@@ -2,6 +2,7 @@ package ca.macewan.capstone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.AsyncTaskLoader;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.view.Menu;
@@ -40,6 +42,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ProfileActivity extends AppCompatActivity {
+    Bitmap picBitmap;
     FirebaseAuth firebaseAuth;
     ImageView profilePicture;
     EditText editName, editEmail, editPhone;
@@ -82,15 +85,8 @@ public class ProfileActivity extends AppCompatActivity {
                         role.setText(user.role);
 
                         if (user.picture != null) {
-                            try {
-                                URL imageUrl = new URL(user.picture);
-                                Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openStream());
-                                profilePicture.setImageBitmap(bitmap);
-                            } catch (MalformedURLException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            BitmapAsync bitmapAsync = new BitmapAsync();
+                            bitmapAsync.execute(user.picture);
                         }
 
                         editName.setText(user.name);
@@ -206,6 +202,35 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             } else if (resultCode == Activity.RESULT_CANCELED)  {
                 Toast.makeText(this, "Canceled", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private static Bitmap DownloadBitmap(String src) {
+        try {
+            URL imageUrl = new URL(src);
+            Bitmap bitmap = BitmapFactory.decodeStream(imageUrl.openStream());
+            return bitmap;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private class BitmapAsync extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            return DownloadBitmap(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            //  return the bitmap by doInBackground and store in result
+            if (bitmap != null) {
+                profilePicture.setImageBitmap(bitmap);
             }
         }
     }
