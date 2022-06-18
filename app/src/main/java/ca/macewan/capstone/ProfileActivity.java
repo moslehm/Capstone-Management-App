@@ -144,13 +144,11 @@ public class ProfileActivity extends AppCompatActivity {
                         item.setIcon(R.drawable.ic_baseline_save_24);
                     } else {
                         Toast.makeText(this, "Saving...", Toast.LENGTH_LONG).show();
-
-                        User updatedUser = new User(editEmail.getText().toString(),
-                                editName.getText().toString(),
-                                role.getText().toString(),
-                                editPhone.getText().toString());
-
-                        user.set(updatedUser);
+                        user.update(
+                                "email", editEmail.getText().toString(),
+                                "name", editName.getText().toString(),
+                                "phone", editPhone.getText().toString()
+                        );
                         editName.setEnabled(false);
                         editEmail.setEnabled(false);
                         editPhone.setEnabled(false);
