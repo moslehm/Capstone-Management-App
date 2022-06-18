@@ -188,8 +188,16 @@ public class ProfileActivity extends AppCompatActivity {
                                 .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                        Toast.makeText(getApplicationContext(), "Profile picture uploaded", Toast.LENGTH_SHORT).show();
-                                        user.update("picture", task.getResult().getMetadata().getReference().getDownloadUrl());
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(getApplicationContext(), "Profile picture uploaded", Toast.LENGTH_SHORT).show();
+                                            task.getResult().getMetadata().getReference().getDownloadUrl()
+                                                    .addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Uri> task) {
+                                                            user.update("picture", task.getResult().toString());
+                                                        }
+                                                    });
+                                        }
                                     }
                                 });
                     } catch (IOException e) {
