@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment {
                             if (fragmentVisible) {
                                 updateView();
                             } else {
-                                if (user.projects.size() > 1) {
+                                if (user.projects != null && user.projects.size() > 1) {
                                     if (prevSize <= 1)
                                         updateNeeded = true;
                                     else
@@ -247,5 +247,6 @@ public class HomeFragment extends Fragment {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         fragmentVisible = !hidden;
+        System.out.println(fragmentVisible);
     }
 }
