@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.view.Menu;
@@ -177,17 +178,18 @@ public class ProfileActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 if (data != null) {
                     try {
-                        ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), data.getData());
+                        Uri image = data.getData();
+                        ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), image);
                         Bitmap bitmap = ImageDecoder.decodeBitmap(source);
                         profilePicture.setImageBitmap(bitmap);
                         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                        StorageReference imageRef = storageRef.child("user_images/" + firebaseAuth.getCurrentUser().getEmail() + "/" + data.getData().getLastPathSegment());
-                        imageRef.putFile(data.getData())
-                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        StorageReference imageRef = storageRef.child("user_images/" + firebaseAuth.getCurrentUser().getEmail() + "/" + image.getLastPathSegment());
+                        imageRef.putFile(image)
+                                .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                     @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                         Toast.makeText(getApplicationContext(), "Profile picture uploaded", Toast.LENGTH_SHORT).show();
-                                        user.update("picture", taskSnapshot.getMetadata().getReference().getDownloadUrl());
+                                        user.update("picture", task.getResult().getMetadata().getReference().getDownloadUrl());
                                     }
                                 });
                     } catch (IOException e) {
