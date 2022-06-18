@@ -58,8 +58,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observer;
 
+import ca.macewan.capstone.adapter.SharedMethods;
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
 
@@ -164,7 +166,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 String title = editTextTitle.getText().toString();
                 String description = editTextDescription.getText().toString();
                 String year = editTextYear.getText().toString();
-                Project project = new Project(creator, title, description, selectedSemester, year);
+                Project project = new Project(creator, title, description, selectedSemester, year, tags);
 
                 db.collection("Projects")
                     .add(project)
@@ -175,7 +177,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                 DocumentReference projectRef = task.getResult();
                                 inviteSupervisors(projectRef);
                                 creator.update("projects", FieldValue.arrayUnion(projectRef));
-                                projectRef.update("tags", tags);
+//                                projectRef.update("tags", tags);
                                 if (linearLayoutImages.getChildCount() - 1 == 0) {
                                     finish();
                                 }
@@ -214,9 +216,9 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                             for (Object object : objects) {
                                                 Uri uri = (Uri) object;
                                                 imagePaths.add(uri.toString());
-                                                finish();
                                             }
                                             projectRef.update("imagePaths", imagePaths);
+                                            finish();
                                         }
                                     });
                                 }

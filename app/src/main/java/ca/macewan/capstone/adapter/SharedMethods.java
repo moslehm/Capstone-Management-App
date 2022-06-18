@@ -44,7 +44,6 @@ public class SharedMethods {
                     String info = task.getResult().get("name").toString()
                             + " <" + task.getResult().get("email").toString() + ">";
                     String temp = (String) textView.getContentText();
-                    System.out.println(info);
                     if (temp.equals("")) {
                         textView.setContentText(info, null);
                     }
@@ -100,13 +99,10 @@ public class SharedMethods {
         MaterialTextView textViewDescription = (MaterialTextView) projectView.findViewById(R.id.textViewDescription);
         MaterialTextView textViewTags = (MaterialTextView) projectView.findViewById(R.id.textViewTags);
         CheckBox checkBoxStatus = (CheckBox) projectView.findViewById(R.id.checkBox_StatusProf);
-        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot documentSnapshot = task.getResult();
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     textViewTitle.setContentText(documentSnapshot.getString("name"), null);
 
@@ -157,7 +153,7 @@ public class SharedMethods {
         });
     }
 
-    private static void displaySupervisors(Object object, MaterialTextView textView) {
+    public static void displaySupervisors(Object object, MaterialTextView textView) {
         if (object == null) {
             textView.setContentText("Pending", null);
             return;
@@ -170,7 +166,7 @@ public class SharedMethods {
         displayItems(members, textView);
     }
 
-    private static void displayMembers(Object object, MaterialTextView textView) {
+    public static void displayMembers(Object object, MaterialTextView textView) {
         // TODO: check project's "invitedSupervisors" field and display "None" if there are none there
         if (object == null) {
             textView.setContentText("None", null);
@@ -274,4 +270,7 @@ public class SharedMethods {
         }
     }
 
+    public static <T> boolean listIsEmpty(List<T> list) {
+        return list == null || list.size() == 0;
+    }
 }

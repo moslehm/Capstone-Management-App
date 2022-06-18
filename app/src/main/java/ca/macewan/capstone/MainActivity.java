@@ -46,16 +46,22 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.ic_home:
+                        if (selected == homeFragment)
+                            break;
                         hideFragment(selected);
                         selected = homeFragment;
                         showFragment(selected);
                         break;
                     case R.id.ic_list:
+                        if (selected == listFragment)
+                            break;
                         hideFragment(selected);
                         selected = listFragment;
                         showFragment(selected);
                         break;
                     case R.id.ic_settings:
+                        if (selected == settingsFragment)
+                            break;
                         hideFragment(selected);
                         selected = settingsFragment;
                         showFragment(selected);

@@ -3,17 +3,16 @@ package ca.macewan.capstone;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -29,8 +28,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
-import org.w3c.dom.Document;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +35,8 @@ import ca.macewan.capstone.adapter.HomeRecyclerAdapter;
 import ca.macewan.capstone.adapter.SharedMethods;
 
 public class HomeFragment extends Fragment {
+    private static final String TAG = "HomeFragment";
+
     private TextView textViewDefault;
     private View singleProjectView;
     private String email;
@@ -50,7 +49,8 @@ public class HomeFragment extends Fragment {
     private Menu menu;
     private boolean fragmentVisible;
     private boolean updateNeeded;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout swipeRefreshRecycler;
+    private SwipeRefreshLayout swipeRefreshSingleProject;
 
     public HomeFragment() {
     }
@@ -81,7 +81,7 @@ public class HomeFragment extends Fragment {
                     public void onEvent(@Nullable DocumentSnapshot snapshot,
                                         @Nullable FirebaseFirestoreException e) {
                         if (snapshot != null && snapshot.exists()) {
-                            System.out.println("Firebase user updated");
+                            Log.d(TAG, "User fields modified: " + snapshot.getData());
                             user = snapshot.toObject(User.class);
                             if (fragmentVisible) {
                                 updateView();
@@ -98,12 +98,20 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshRecycler = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshRecycler);
+        swipeRefreshRecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 updateView();
-                swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshRecycler.setRefreshing(false);
+            }
+        });
+        swipeRefreshSingleProject = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshSingleProject);
+        swipeRefreshSingleProject.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateView();
+                swipeRefreshSingleProject.setRefreshing(false);
             }
         });
 
@@ -136,6 +144,10 @@ public class HomeFragment extends Fragment {
                 singleProjectView.setVisibility(View.VISIBLE);
                 textViewDefault.setVisibility(View.GONE);
                 recyclerView_Accepted.setVisibility(View.GONE);
+                swipeRefreshSingleProject.setEnabled(true);
+                swipeRefreshSingleProject.setVisibility(View.VISIBLE);
+                swipeRefreshRecycler.setEnabled(false);
+                swipeRefreshRecycler.setVisibility(View.GONE);
                 SharedMethods.setupProjectView(singleProjectView, projects.get(0), email, getActivity());
             }
             enableMenuButtons(projects.get(0));
@@ -145,8 +157,24 @@ public class HomeFragment extends Fragment {
                 recyclerView_Accepted.setVisibility(View.VISIBLE);
                 textViewDefault.setVisibility(View.GONE);
                 singleProjectView.setVisibility(View.GONE);
+                swipeRefreshRecycler.setEnabled(true);
+                swipeRefreshRecycler.setVisibility(View.VISIBLE);
+                swipeRefreshSingleProject.setEnabled(false);
+                swipeRefreshSingleProject.setVisibility(View.GONE);
                 menu.findItem(R.id.action_delete).setVisible(false);
                 menu.findItem(R.id.action_edit).setVisible(false);
+
+                homeRecyclerAdapter = new HomeRecyclerAdapter(user.projects);
+                recyclerView_Accepted.setAdapter(homeRecyclerAdapter);
+                recyclerView_Accepted.setLayoutManager(new LinearLayoutManager(getActivity()));
+                homeRecyclerAdapter.setOnProjectListener(new HomeRecyclerAdapter.OnProjectListener() {
+                    @Override
+                    public void onProjectClick(int position, String projectID) {
+                        Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
+                        intent.putExtra("projectID", projectID);
+                        startActivity(intent);
+                    }
+                });
             }
             updateList();
         }
@@ -154,17 +182,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateList() {
-        homeRecyclerAdapter = new HomeRecyclerAdapter(user.projects);
-        recyclerView_Accepted.setAdapter(homeRecyclerAdapter);
-        recyclerView_Accepted.setLayoutManager(new LinearLayoutManager(getActivity()));
-        homeRecyclerAdapter.setOnProjectListener(new HomeRecyclerAdapter.OnProjectListener() {
-            @Override
-            public void onProjectClick(int position, String projectID) {
-                Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
-                intent.putExtra("projectID", projectID);
-                startActivity(intent);
-            }
-        });
+        homeRecyclerAdapter.updateList(user.projects);
     }
 
     private void enableMenuButtons(DocumentReference project) {
@@ -208,10 +226,9 @@ public class HomeFragment extends Fragment {
         menu.findItem(R.id.action_delete).setVisible(false);
         if (user != null) {
             if (updateNeeded) {
-                System.out.println("updating view");
                 updateView();
                 updateNeeded = false;
-            } else if (user.projects.size() == 1 && prevSize == 1)
+            } else if (user.projects != null && user.projects.size() == 1 && prevSize == 1)
                 enableMenuButtons(user.projects.get(0));
         }
     }

@@ -53,7 +53,7 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
                         holder.textView_pTags.setText(android.text.TextUtils.join(", ", tagsList));
                     }
 
-                    if (!task.getResult().getBoolean("status"))
+                    if (!snapshot.getBoolean("status"))
                         holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
                     else
                         holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
@@ -97,12 +97,17 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
 
         @Override
         public void onClick(View v) {
-            onProjectListener.onProjectClick(getBindingAdapterPosition(),
-                    documentReferenceList.get(getBindingAdapterPosition()).getId());
+            String projectId = documentReferenceList.get(getBindingAdapterPosition()).getId();
+            onProjectListener.onProjectClick(getBindingAdapterPosition(), projectId);
         }
     }
 
     public interface OnProjectListener {
         void onProjectClick(int position, String projectID);
+    }
+
+    public void updateList(List<DocumentReference> list){
+        documentReferenceList = list;
+        notifyDataSetChanged();
     }
 }

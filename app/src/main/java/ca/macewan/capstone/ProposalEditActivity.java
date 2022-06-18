@@ -35,6 +35,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -136,6 +137,7 @@ public class ProposalEditActivity extends AppCompatActivity {
                 projectRef.update("name", editTextTitle.getText().toString());
                 projectRef.update("description", editTextDescription.getText().toString());
                 projectRef.update("tags", tags);
+                projectRef.update("lastModified", Timestamp.now());
                 finish();
             }
         });

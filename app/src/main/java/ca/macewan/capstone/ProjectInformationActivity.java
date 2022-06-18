@@ -2,12 +2,16 @@ package ca.macewan.capstone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -15,11 +19,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Objects;
 
 import ca.macewan.capstone.adapter.SharedMethods;
+import uk.co.onemandan.materialtextview.MaterialTextView;
 
 public class ProjectInformationActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -29,6 +35,9 @@ public class ProjectInformationActivity extends AppCompatActivity {
     String email;
     private Menu menu;
     private DocumentReference userRef;
+    private Project project;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private View projectView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +56,151 @@ public class ProjectInformationActivity extends AppCompatActivity {
     }
 
     private void setUp() {
+        EventCompleteListener projectNotNull = new EventCompleteListener() {
+            @Override
+            public void onComplete() {
+                updateView(project);
+
+                swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+                swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        update();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        };
+
         projectID = getIntent().getExtras().getString("projectID");
         projectRef = db.collection("Projects").document(projectID);
         userRef = db.collection("Users").document(email);
-        View projectView = findViewById(R.id.projectLayout);
-        SharedMethods.setupProjectView(projectView, projectRef, email, this);
+        projectView = findViewById(R.id.projectLayout);
+
+        project = getIntent().getExtras().getParcelable("project");
+        if (project != null) {
+            projectNotNull.onComplete();
+        } else {
+            projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    project = task.getResult().toObject(Project.class);
+                    assert project != null;
+                    project.setProjectRef(task.getResult().getReference());
+                    project.setAllStrings(new EventCompleteListener() {
+                        @Override
+                        public void onComplete() {
+                            projectNotNull.onComplete();
+                        }
+                    });
+                }
+            });
+        }
+//        SharedMethods.setupProjectView(projectView, projectRef, email, this);
+    }
+
+    private void update() {
+        projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                Project project = task.getResult().toObject(Project.class);
+                assert project != null;
+                project.setProjectRef(task.getResult().getReference());
+                project.setAllStrings(new EventCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        updateView(project);
+                    }
+                });
+            }
+        });
+    }
+
+    private void updateView(Project project) {
+        MaterialTextView textViewTitle = (MaterialTextView) projectView.findViewById(R.id.textViewTitle);
+        MaterialTextView textViewCreator = (MaterialTextView) projectView.findViewById(R.id.textViewCreator);
+        MaterialTextView textViewSemesterAndYear = (MaterialTextView) projectView.findViewById(R.id.textViewSemesterAndYear);
+        MaterialTextView textViewSupervisors = (MaterialTextView) projectView.findViewById(R.id.textViewSupervisors);
+        MaterialTextView textViewMembers = (MaterialTextView) projectView.findViewById(R.id.textViewMembers);
+        MaterialTextView textViewDescription = (MaterialTextView) projectView.findViewById(R.id.textViewDescription);
+        MaterialTextView textViewTags = (MaterialTextView) projectView.findViewById(R.id.textViewTags);
+        View textViewImages = projectView.findViewById(R.id.textViewImages);
+        LinearLayout linearLayoutImages = (LinearLayout) projectView.findViewById(R.id.linearLayoutImages);
+        CheckBox checkBoxStatus = (CheckBox) projectView.findViewById(R.id.checkBox_StatusProf);
+
+        textViewTitle.setContentText(project.getName(), null);
+        textViewCreator.setContentText(project.getCreatorString(), null);
+        textViewSemesterAndYear.setContentText(project.getSemester() + " " + project.getYear(), null);
+        setSupervisorsTextView(project, textViewSupervisors);
+        setMembersTextView(project, textViewMembers);
+        textViewDescription.setContentText(project.getDescription(), null);
+        setTagsTextView(project, textViewTags);
+        setImageViews(project, textViewImages, linearLayoutImages);
+    }
+
+    private void setImageViews(Project project, View textViewImages, LinearLayout linearLayoutImages) {
+        List<String> imagePaths = project.getImagePaths();
+        if (SharedMethods.listIsEmpty(imagePaths)) {
+            textViewImages.setVisibility(View.GONE);
+            linearLayoutImages.setVisibility(View.GONE);
+            return;
+        }
+        textViewImages.setVisibility(View.VISIBLE);
+        linearLayoutImages.setVisibility(View.VISIBLE);
+        linearLayoutImages.removeAllViews();
+        for (String imagePath : imagePaths) {
+            ImageView newImage = new ImageView(this);
+            linearLayoutImages.addView(newImage);
+            Picasso.get().load(imagePath).into(newImage);
+        }
+    }
+
+    private void setSupervisorsTextView(Project project, MaterialTextView textViewSupervisors) {
+        List<String> supervisorsStringList = project.getSupervisorsStringList();
+        List<String> supervisorsPendingStringList = project.getSupervisorsPendingStringList();
+
+        if (SharedMethods.listIsEmpty(supervisorsStringList)) {
+            // No supervisors, check if any are pending
+            if (SharedMethods.listIsEmpty(supervisorsPendingStringList)) {
+                textViewSupervisors.setContentText("None", null);
+                return;
+            }
+            textViewSupervisors.setContentText("Pending", null);
+            return;
+        }
+        textViewSupervisors.setContentText(String.join("\n", supervisorsStringList), null);
+    }
+
+    private void setMembersTextView(Project project, MaterialTextView textViewMembers) {
+        List<String> membersStringList = project.getMembersStringList();
+        if (SharedMethods.listIsEmpty(membersStringList)) {
+            textViewMembers.setContentText("None", null);
+            return;
+        }
+        textViewMembers.setContentText(String.join("\n", membersStringList), null);
+    }
+
+    private void setTagsTextView(Project project, MaterialTextView textViewTags) {
+        List<String> tags = project.getTags();
+        if (SharedMethods.listIsEmpty(tags)) {
+            textViewTags.setVisibility(View.GONE);
+            return;
+        }
+        textViewTags.setContentText(String.join("\n", tags), null);
+    }
+
+    private String getSupervisorsString(String supervisorsString) {
+        if (Objects.equals(supervisorsString, "")) {
+            return "Pending";
+        }
+        return supervisorsString;
+    }
+
+    private String getMembersString(String membersString) {
+        if (Objects.equals(membersString, "")) {
+            return "None";
+        }
+        return membersString;
     }
 
     @Override
@@ -159,4 +308,14 @@ public class ProjectInformationActivity extends AppCompatActivity {
         finish();
         return true;
     }
+
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        if (swipeRefreshLayout!=null) {
+//            swipeRefreshLayout.setRefreshing(false);
+//            swipeRefreshLayout.destroyDrawingCache();
+//            swipeRefreshLayout.clearAnimation();
+//        }
+//    }
 }
