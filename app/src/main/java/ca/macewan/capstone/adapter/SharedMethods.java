@@ -9,17 +9,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -29,9 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 import ca.macewan.capstone.EventCompleteListener;
-import ca.macewan.capstone.ProjectInformationActivity;
 import ca.macewan.capstone.R;
-import ca.macewan.capstone.User;
 import uk.co.onemandan.materialtextview.MaterialTextView;
 
 public class SharedMethods {
@@ -187,7 +183,7 @@ public class SharedMethods {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         projectRef.update("members", FieldValue.arrayRemove(userRef));
-                        userRef.update("projects", FieldValue.arrayRemove(projectRef));
+                        userRef.update("projects", FieldValue.arrayRemove(projectRef.getId()));
                         eventCompleteListener.onComplete();
                     }
                 })
@@ -206,7 +202,7 @@ public class SharedMethods {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         projectRef.update("members", FieldValue.arrayUnion(userRef));
-                        userRef.update("projects", FieldValue.arrayUnion(projectRef));
+                        userRef.update("projects", FieldValue.arrayUnion(projectRef.getId()));
                         eventCompleteListener.onComplete();
                     }
                 })
@@ -230,10 +226,11 @@ public class SharedMethods {
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
                                     DocumentSnapshot snapshot = task.getResult();
-                                    userRef.update("projects", FieldValue.arrayRemove(projectRef));
-                                    removeFromFields(snapshot.get("members"), projectRef, "projects");
-                                    removeFromFields(snapshot.get("supervisors"), projectRef, "projects");
-                                    removeFromFields(snapshot.get("supervisorsPending"), projectRef, "invited");
+                                    String projectId = projectRef.getId();
+                                    userRef.update("projects", FieldValue.arrayRemove(projectId));
+                                    removeFromFields(snapshot.get("members"), projectId, "projects");
+                                    removeFromFields(snapshot.get("supervisors"), projectId, "projects");
+                                    removeFromFields(snapshot.get("supervisorsPending"), projectId, "invited");
                                     Object imagesObject = snapshot.get("imagePaths");
                                     if (imagesObject != null) {
                                         List<String> imagesList = (ArrayList<String>) imagesObject;
@@ -260,7 +257,7 @@ public class SharedMethods {
     // Removes itemToRemove from fieldString of each item in listObject
     // Ex. Remove a project's DocumentReference from "projects" field for each member in the list
     // provided
-    private static void removeFromFields(Object listObject, DocumentReference itemToRemove, String fieldString) {
+    private static void removeFromFields(Object listObject, String itemToRemove, String fieldString) {
         if (listObject == null) {
             return;
         }
@@ -272,5 +269,22 @@ public class SharedMethods {
 
     public static <T> boolean listIsEmpty(List<T> list) {
         return list == null || list.size() == 0;
+    }
+
+    public static void createFragment(FragmentManager supportFragmentManager, Fragment fragment, String tag){
+        supportFragmentManager.beginTransaction()
+                .add(R.id.fl_wrapper, fragment, tag)
+                .hide(fragment)
+                .commit();
+    }
+    public static void showFragment(FragmentManager supportFragmentManager, Fragment fragment){
+        supportFragmentManager.beginTransaction()
+                .show(fragment)
+                .commit();
+    }
+    public static void hideFragment(FragmentManager supportFragmentManager, Fragment fragment){
+        supportFragmentManager.beginTransaction()
+                .hide(fragment)
+                .commit();
     }
 }

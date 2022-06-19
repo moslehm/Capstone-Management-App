@@ -11,7 +11,7 @@ public class User {
     public String name;
     public String role;
     public String phone;
-    public List<DocumentReference> projects;
+    public List<String> projects;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)

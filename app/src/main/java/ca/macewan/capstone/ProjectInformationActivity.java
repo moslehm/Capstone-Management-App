@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,12 +16,15 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +42,8 @@ public class ProjectInformationActivity extends AppCompatActivity {
     private Project project;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View projectView;
+    private View profButtonsLayout;
+    private boolean isSupervisor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +79,14 @@ public class ProjectInformationActivity extends AppCompatActivity {
         };
 
         projectID = getIntent().getExtras().getString("projectID");
+        isSupervisor = getIntent().getExtras().getBoolean("isSupervisor");
         projectRef = db.collection("Projects").document(projectID);
         userRef = db.collection("Users").document(email);
         projectView = findViewById(R.id.projectLayout);
+        profButtonsLayout = findViewById(R.id.profButtonsLayout);
 
         project = getIntent().getExtras().getParcelable("project");
-        if (project != null) {
+        if (project != null && !isSupervisor) {
             projectNotNull.onComplete();
         } else {
             projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -93,10 +101,86 @@ public class ProjectInformationActivity extends AppCompatActivity {
                             projectNotNull.onComplete();
                         }
                     });
+                    if (isSupervisor) {
+                        profButtonsSetUp();
+                    }
                 }
             });
         }
 //        SharedMethods.setupProjectView(projectView, projectRef, email, this);
+    }
+
+    private void profButtonsSetUp() {
+        View button_Accept = profButtonsLayout.findViewById(R.id.button_Accept);
+        View button_Decline = profButtonsLayout.findViewById(R.id.button_Decline);
+
+        button_Decline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialAlertDialogBuilder(ProjectInformationActivity.this)
+                        .setMessage("Decline the request?")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // remove the invitation from array
+                                userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
+                                projectRef.update("supervisorsPending", userRef);
+                                profButtonsLayout.setVisibility(View.GONE);
+                                updateOptionsMenu();
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        button_Accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialAlertDialogBuilder(ProjectInformationActivity.this)
+                        .setMessage("Agree to supervise?")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // remove supervisor from pending supervisors list
+                                projectRef.update("supervisorsPending", FieldValue.arrayRemove(userRef));
+                                // add prof to supervisor list
+                                projectRef.update("supervisors", FieldValue.arrayUnion(userRef));
+                                // add request to accepted array
+                                userRef.update("projects", FieldValue.arrayUnion(projectRef.getId()));
+                                // remove request from invited array
+                                userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
+                                profButtonsLayout.setVisibility(View.GONE);
+                                updateOptionsMenu();
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        // disable the button for prof that was not invited to supervise
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<String> invitedProjList = (List<String>) task.getResult().get("invited");
+                    if (!invitedProjList.contains(projectRef.getId())) {
+                        profButtonsLayout.setVisibility(View.GONE);
+                    } else {
+                        profButtonsLayout.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
     }
 
     private void update() {
@@ -233,14 +317,15 @@ public class ProjectInformationActivity extends AppCompatActivity {
 
         boolean userJoined = false;
         if (user.projects != null) {
-            for (DocumentReference project : user.projects) {
-                if (project.getId().equals(projectRef.getId())) {
+            for (String projectId : user.projects) {
+                if (projectId.equals(projectRef.getId())) {
                     userJoined = true;
                     break;
                 }
             }
             if (!userJoined) {
-                menu.findItem(R.id.action_join).setVisible(true);
+                if (!isSupervisor)
+                    menu.findItem(R.id.action_join).setVisible(true);
                 return;
             }
         }

@@ -176,7 +176,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 DocumentReference projectRef = task.getResult();
                                 inviteSupervisors(projectRef);
-                                creator.update("projects", FieldValue.arrayUnion(projectRef));
+                                creator.update("projects", FieldValue.arrayUnion(projectRef.getId()));
 //                                projectRef.update("tags", tags);
                                 if (linearLayoutImages.getChildCount() - 1 == 0) {
                                     finish();
@@ -235,11 +235,11 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 String supervisorEmail = arrayListSupervisors.get(i).email;
                 DocumentReference supervisor = db.collection("Users").document(supervisorEmail);
                 if (supervisorEmail.equals(userEmail)) {
-                    supervisor.update("projects", FieldValue.arrayUnion(projectRef));
+                    supervisor.update("projects", FieldValue.arrayUnion(projectRef.getId()));
                     projectRef.update("supervisors", FieldValue.arrayUnion(supervisor));
                     continue;
                 }
-                supervisor.update("invited", FieldValue.arrayUnion(projectRef));
+                supervisor.update("invited", FieldValue.arrayUnion(projectRef.getId()));
                 projectRef.update("supervisorsPending", FieldValue.arrayUnion(supervisor));
             }
         }

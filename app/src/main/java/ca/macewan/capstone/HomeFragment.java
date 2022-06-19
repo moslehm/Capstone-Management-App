@@ -28,29 +28,37 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import ca.macewan.capstone.adapter.HomeRecyclerAdapter;
 import ca.macewan.capstone.adapter.SharedMethods;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ListFragment.OnListListener {
     private static final String TAG = "HomeFragment";
+    private static final int HAS_NONE = 0;
+    private static final int HAS_ONE = 1;
+    private static final int HAS_MORE_THAN_ONE = 2;
 
     private TextView textViewDefault;
     private View singleProjectView;
     private String email;
-    private User user;
-    private RecyclerView recyclerView_Accepted;
+//    private User user;
+    private ListFragment listFragment;
+//    private RecyclerView recyclerView_Accepted;
     private FirebaseFirestore db;
-    private HomeRecyclerAdapter homeRecyclerAdapter;
+//    private HomeRecyclerAdapter homeRecyclerAdapter;
     private View view;
     private int prevSize;
-    private Menu menu;
+//    private Menu menu;
     private boolean fragmentVisible;
-    private boolean updateNeeded;
+//    private boolean updateNeeded;
     private SwipeRefreshLayout swipeRefreshRecycler;
     private SwipeRefreshLayout swipeRefreshSingleProject;
+    private ArrayList<String> projectIds;
+    private int currentState;
+    private boolean isVisible;
 
     public HomeFragment() {
     }
@@ -69,40 +77,30 @@ public class HomeFragment extends Fragment {
 
         textViewDefault = (TextView) view.findViewById(R.id.textViewDefault);
         singleProjectView = view.findViewById(R.id.singleProject);
-        recyclerView_Accepted = (RecyclerView) view.findViewById(R.id.recyclerView_Accepted);
+//        recyclerView_Accepted = (RecyclerView) view.findViewById(R.id.recyclerView_Accepted);
         prevSize = -1;
         fragmentVisible = true;
 
         email = getArguments().getString("email");
-        db.collection("Users")
-                .document(email)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (snapshot != null && snapshot.exists()) {
-                            Log.d(TAG, "User fields modified: " + snapshot.getData());
-                            user = snapshot.toObject(User.class);
-                            if (fragmentVisible) {
-                                updateView();
-                            } else {
-                                if (user.projects.size() > 1) {
-                                    if (prevSize <= 1)
-                                        updateNeeded = true;
-                                    else
-                                        updateList();
-                                } else
-                                    updateNeeded = true;
-                            }
-                        }
-                    }
-                });
+//        refresh();
+//                        if (fragmentVisible) {
+//                            updateView();
+//                        } else {
+//                            if (user.projects.size() > 1) {
+//                                if (prevSize <= 1)
+//                                    updateNeeded = true;
+//                                else
+//                                    updateList();
+//                            } else
+//                                updateNeeded = true;
+//                        }
+
 
         swipeRefreshRecycler = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshRecycler);
         swipeRefreshRecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                updateView();
+                refresh();
                 swipeRefreshRecycler.setRefreshing(false);
             }
         });
@@ -110,105 +108,141 @@ public class HomeFragment extends Fragment {
         swipeRefreshSingleProject.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                updateView();
+                refresh();
                 swipeRefreshSingleProject.setRefreshing(false);
             }
         });
 
+        Bundle bundle = new Bundle();
+        bundle.putString("email", email);
+        bundle.putString("screenType", "homeList");
+        bundle.putBoolean("isSupervisor", false);
+        listFragment = new ListFragment();
+        listFragment.setArguments(bundle);
+        listFragment.setListener(this);
+        SharedMethods.createFragment(getParentFragmentManager(), listFragment, "homeList");
+
         return view;
     }
 
+    private void refresh() {
+        db.collection("Users")
+                .document(email)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        Log.d(TAG, "User fields modified: " + snapshot.getData());
+                        projectIds = (ArrayList<String>) task.getResult().get("projects");
+                        updateView();
+                    }
+                });
+    }
+
     private void updateView() {
-        final List<DocumentReference> projects = user.projects;
-        if (projects == null) {
+//        final List<String> projects = projectIds;
+        if (projectIds == null) {
+            currentState = HAS_NONE;
             // User has no projects, make sure default TextView visible
             textViewDefault.setVisibility(View.VISIBLE);
-            recyclerView_Accepted.setVisibility(View.GONE);
+            SharedMethods.hideFragment(getParentFragmentManager(), listFragment);
+//            recyclerView_Accepted.setVisibility(View.GONE);
             singleProjectView.setVisibility(View.GONE);
-            menu.findItem(R.id.action_delete).setVisible(false);
-            menu.findItem(R.id.action_edit).setVisible(false);
+            requireActivity().invalidateOptionsMenu();
+//            menu.findItem(R.id.action_delete).setVisible(false);
+//            menu.findItem(R.id.action_edit).setVisible(false);
             return;
         }
-        int size = projects.size();
+        int size = projectIds.size();
         if (prevSize != 0 && size == 0) {
+            currentState = HAS_NONE;
             // User has no projects, make sure default TextView visible
             textViewDefault.setVisibility(View.VISIBLE);
-            recyclerView_Accepted.setVisibility(View.GONE);
+            SharedMethods.hideFragment(getParentFragmentManager(), listFragment);
+//            recyclerView_Accepted.setVisibility(View.GONE);
             singleProjectView.setVisibility(View.GONE);
-            menu.findItem(R.id.action_delete).setVisible(false);
-            menu.findItem(R.id.action_edit).setVisible(false);
+            requireActivity().invalidateOptionsMenu();
+//            menu.findItem(R.id.action_delete).setVisible(false);
+//            menu.findItem(R.id.action_edit).setVisible(false);
         }
         else if (size == 1) {
+            currentState = HAS_ONE;
+            DocumentReference projectRef = FirebaseFirestore.getInstance().collection("Projects").document(projectIds.get(0));
             // User only has one project, no need for a list view
             if (prevSize != 1) {
                 singleProjectView.setVisibility(View.VISIBLE);
                 textViewDefault.setVisibility(View.GONE);
-                recyclerView_Accepted.setVisibility(View.GONE);
+                SharedMethods.hideFragment(getParentFragmentManager(), listFragment);
+//                recyclerView_Accepted.setVisibility(View.GONE);
                 swipeRefreshSingleProject.setEnabled(true);
                 swipeRefreshSingleProject.setVisibility(View.VISIBLE);
                 swipeRefreshRecycler.setEnabled(false);
                 swipeRefreshRecycler.setVisibility(View.GONE);
-                SharedMethods.setupProjectView(singleProjectView, projects.get(0), email, getActivity());
+                requireActivity().invalidateOptionsMenu();
             }
-            enableMenuButtons(projects.get(0));
+            SharedMethods.setupProjectView(singleProjectView, projectRef, email, getActivity());
+//            enableMenuButtons(projectRef);
         }
         else if (size > 1) {
+            currentState = HAS_MORE_THAN_ONE;
             if (prevSize < 2) {
-                recyclerView_Accepted.setVisibility(View.VISIBLE);
+                SharedMethods.showFragment(getParentFragmentManager(), listFragment);
+//                recyclerView_Accepted.setVisibility(View.VISIBLE);
                 textViewDefault.setVisibility(View.GONE);
                 singleProjectView.setVisibility(View.GONE);
                 swipeRefreshRecycler.setEnabled(true);
                 swipeRefreshRecycler.setVisibility(View.VISIBLE);
                 swipeRefreshSingleProject.setEnabled(false);
                 swipeRefreshSingleProject.setVisibility(View.GONE);
-                menu.findItem(R.id.action_delete).setVisible(false);
-                menu.findItem(R.id.action_edit).setVisible(false);
-
-                homeRecyclerAdapter = new HomeRecyclerAdapter(user.projects);
-                recyclerView_Accepted.setAdapter(homeRecyclerAdapter);
-                recyclerView_Accepted.setLayoutManager(new LinearLayoutManager(getActivity()));
-                homeRecyclerAdapter.setOnProjectListener(new HomeRecyclerAdapter.OnProjectListener() {
-                    @Override
-                    public void onProjectClick(int position, String projectID) {
-                        Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
-                        intent.putExtra("projectID", projectID);
-                        startActivity(intent);
-                    }
-                });
+//                menu.findItem(R.id.action_delete).setVisible(false);
+//                menu.findItem(R.id.action_edit).setVisible(false);
+                requireActivity().invalidateOptionsMenu();
             }
-            updateList();
         }
+//                homeRecyclerAdapter = new HomeRecyclerAdapter(user.projects);
+//                recyclerView_Accepted.setAdapter(homeRecyclerAdapter);
+//                recyclerView_Accepted.setLayoutManager(new LinearLayoutManager(getActivity()));
+//                homeRecyclerAdapter.setOnProjectListener(new HomeRecyclerAdapter.OnProjectListener() {
+//                    @Override
+//                    public void onProjectClick(int position, String projectID) {
+//                        Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
+//                        intent.putExtra("projectID", projectID);
+//                        startActivity(intent);
+//                    }
+//                });
+//            updateList();
         prevSize = size;
     }
 
-    private void updateList() {
-        homeRecyclerAdapter.updateList(user.projects);
-    }
+    //    private void updateList() {
+//        homeRecyclerAdapter.updateList(user.projects);
+//    }
 
-    private void enableMenuButtons(DocumentReference project) {
-        project.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentReference creatorRef = task.getResult().getDocumentReference("creator");
-                    creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                String creatorEmail = task.getResult().getString("email");
-                                if (Objects.equals(creatorEmail, email))
-                                    menu.findItem(R.id.action_delete).setVisible(true);
-                                else {
-                                    menu.findItem(R.id.action_quit).setVisible(true);
-                                }
-                                menu.findItem(R.id.action_edit).setVisible(true);
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    }
+//    private void enableMenuButtons(DocumentReference project) {
+//        project.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentReference creatorRef = task.getResult().getDocumentReference("creator");
+//                    creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                String creatorEmail = task.getResult().getString("email");
+//                                if (Objects.equals(creatorEmail, email))
+//                                    menu.findItem(R.id.action_delete).setVisible(true);
+//                                else {
+//                                    menu.findItem(R.id.action_quit).setVisible(true);
+//                                }
+//                                menu.findItem(R.id.action_edit).setVisible(true);
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -220,42 +254,69 @@ public class HomeFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        this.menu = menu;
-        menu.findItem(R.id.action_edit).setVisible(false);
-        menu.findItem(R.id.action_quit).setVisible(false);
-        menu.findItem(R.id.action_delete).setVisible(false);
-        if (user != null) {
-            if (updateNeeded) {
-                updateView();
-                updateNeeded = false;
-            } else if (user.projects != null && user.projects.size() == 1 && prevSize == 1)
-                enableMenuButtons(user.projects.get(0));
+//        this.menu = menu;
+        if (currentState == HAS_NONE || currentState == HAS_MORE_THAN_ONE) {
+            menu.findItem(R.id.action_edit).setVisible(false);
+            menu.findItem(R.id.action_quit).setVisible(false);
+            menu.findItem(R.id.action_delete).setVisible(false);
+        } else if (currentState == HAS_ONE) {
+            DocumentReference projectRef = FirebaseFirestore.getInstance().collection("Projects").document(projectIds.get(0));
+            projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentReference creatorRef = task.getResult().getDocumentReference("creator");
+                        creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    String creatorEmail = task.getResult().getString("email");
+                                    if (Objects.equals(creatorEmail, email))
+                                        menu.findItem(R.id.action_delete).setVisible(true);
+                                    else {
+                                        menu.findItem(R.id.action_quit).setVisible(true);
+                                    }
+                                    menu.findItem(R.id.action_edit).setVisible(true);
+                                }
+                            }
+                        });
+                    }
+                }
+        });
         }
+
+//        if (projectIds != null && projectIds.size() == 1 && prevSize == 1) {
+//            DocumentReference projectRef = FirebaseFirestore.getInstance().collection("Projects").document(projectIds.get(0));
+//            enableMenuButtons(projectRef);
+//        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        DocumentReference projectRef = user.projects.get(0);
-        DocumentReference userRef = db.collection("Users").document(email);
-        if (id == R.id.action_edit) {
-            Intent intent = new Intent(getContext(), ProposalEditActivity.class);
-            intent.putExtra("projectID", projectRef.getId());
-            intent.putExtra("email", email);
-            startActivity(intent);
-        } else if (id == R.id.action_quit) {
-            SharedMethods.quitProject(userRef, projectRef, getContext(), new EventCompleteListener() {
-                @Override
-                public void onComplete() {
-                    updateView();
-                }
-            });
-        } else if (id == R.id.action_delete) {
-            SharedMethods.deleteProject(userRef, projectRef, getContext(), new EventCompleteListener() {
-                @Override
-                public void onComplete() {
-                }
-            });
+        if (currentState == HAS_ONE) {
+            int id = item.getItemId();
+            DocumentReference projectRef = FirebaseFirestore.getInstance().collection("Projects").document(projectIds.get(0));
+            DocumentReference userRef = db.collection("Users").document(email);
+            if (id == R.id.action_edit) {
+                Intent intent = new Intent(getContext(), ProposalEditActivity.class);
+                intent.putExtra("projectID", projectRef.getId());
+                intent.putExtra("email", email);
+                startActivity(intent);
+            } else if (id == R.id.action_quit) {
+                SharedMethods.quitProject(userRef, projectRef, getContext(), new EventCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        refresh();
+                    }
+                });
+            } else if (id == R.id.action_delete) {
+                SharedMethods.deleteProject(userRef, projectRef, getContext(), new EventCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        refresh();
+                    }
+                });
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -263,6 +324,47 @@ public class HomeFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        fragmentVisible = !hidden;
+        isVisible = !hidden;
+        System.out.println("onHiddenChanged");
+        if (isVisible) {
+            refresh();
+        }
+        if (projectIds != null && currentState == HAS_MORE_THAN_ONE) {
+            if (!isVisible) {
+                SharedMethods.hideFragment(getParentFragmentManager(), listFragment);
+            } else {
+                SharedMethods.showFragment(getParentFragmentManager(), listFragment);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isVisible) {
+            refresh();
+        }
+        System.out.println("onResume");
+    }
+
+
+    @Override
+    public void onListUpdate(String fragmentName, ListFragment.OnUpdateListener onUpdateListener) {
+        db.collection("Users")
+                .document(email)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            projectIds = (ArrayList<String>) task.getResult().get("projects");
+                            if (projectIds == null) {
+                                onUpdateListener.onUpdateComplete(new ArrayList<String>());
+                            } else {
+                                onUpdateListener.onUpdateComplete(projectIds);
+                            }
+                        }
+                    }
+                });
     }
 }

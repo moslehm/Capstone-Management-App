@@ -31,6 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import ca.macewan.capstone.adapter.RecyclerAdapterV2;
 
@@ -49,6 +50,9 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     private FirebaseFirestore db;
     private List<String> projectIds;
     private boolean settingUp;
+    private OnListListener onListListener;
+    private String screenType;
+    private boolean isSupervisor;
 
     public ListFragment() {
     }
@@ -72,25 +76,37 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     }
 
     public void setUp() {
+        screenType = getArguments().getString("screenType");
+        isSupervisor = getArguments().getBoolean("isSupervisor");
+
         recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
         db = FirebaseFirestore.getInstance();
-        projectIds = new ArrayList<String>();
+//        projectIds = new ArrayList<String>();
 
-        update(new EventCompleteListener() {
-                   @Override
-                   public void onComplete() {
-                       createAdapter();
-                   }
-               });
+        onListListener.onListUpdate(screenType, new OnUpdateListener() {
+            @Override
+            public void onUpdateComplete(ArrayList<String> projectIds) {
+                if (projectIds.size() != 0) {
+                    createAdapter(projectIds);
+                }
+            }
+        });
 
         SwipeRefreshLayout swipeRefreshSingleProject = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
         swipeRefreshSingleProject.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                update(new EventCompleteListener() {
+                // Request update for projectIds
+                onListListener.onListUpdate(screenType, new OnUpdateListener() {
                     @Override
-                    public void onComplete() {
-                        // Completed ID string list update
+                    public void onUpdateComplete(ArrayList<String> projectIds) {
+                        if (recyclerAdapter == null) {
+                            if (projectIds.size() != 0) {
+                                createAdapter(projectIds);
+                            }
+                            return;
+                        }
+                        // projectIds update is complete
                         recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
                             @Override
                             public void onComplete() {
@@ -105,7 +121,7 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         settingUp = false;
     }
 
-    private void createAdapter() {
+    private void createAdapter(ArrayList<String> projectIds) {
         recyclerAdapter = new RecyclerAdapterV2(projectIds, new EventCompleteListener() {
             @Override
             public void onComplete() {
@@ -117,6 +133,7 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
                         Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
                         intent.putExtra("projectID", projectID);
                         intent.putExtra("project", project);
+                        intent.putExtra("isSupervisor", isSupervisor);
                         startActivity(intent);
                     }
                 });
@@ -124,27 +141,29 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         });
     }
 
-    void update(EventCompleteListener eventCompleteListener) {
-        projectIds.clear();
-        db.collection("Projects")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                projectIds.add(document.getId());
-                            }
-                            eventCompleteListener.onComplete();
-                        }
-                    }
-                });
-    }
+//    void update(EventCompleteListener eventCompleteListener) {
+//        projectIds.clear();
+//        db.collection("Projects")
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            for (QueryDocumentSnapshot document : task.getResult()) {
+//                                projectIds.add(document.getId());
+//                            }
+//                            eventCompleteListener.onComplete();
+//                        }
+//                    }
+//                });
+//    }
 
     @Override
     public void onProjectClick(int position, String projectID, Project project) {
         Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
         intent.putExtra("projectID", projectID);
+        intent.putExtra("project", project);
+        intent.putExtra("isSupervisor", isSupervisor);
         startActivity(intent);
     }
 
@@ -153,17 +172,24 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         //inflate menu
         inflater.inflate(R.menu.menu_options, menu);
         MenuItem item = menu.findItem(R.id.app_bar_search);
+        if (Objects.equals(screenType, "homeList")) {
+            menu.findItem(R.id.action_add).setVisible(false);
+        }
         searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                recyclerAdapter.search(query);
+                if (recyclerAdapter != null) {
+                    recyclerAdapter.search(query);
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                recyclerAdapter.search(newText);
+                if (recyclerAdapter != null) {
+                    recyclerAdapter.search(newText);
+                }
                 return false;
             }
         });
@@ -186,16 +212,43 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         if (settingUp) {
             setUp();
         } else {
-            update(new EventCompleteListener() {
+            OnUpdateListener onUpdateListener = new OnUpdateListener() {
                 @Override
-                public void onComplete() {
+                public void onUpdateComplete(ArrayList<String> projectIds) {
+                    if (recyclerAdapter == null) {
+                        if (projectIds.size() != 0) {
+                            createAdapter(projectIds);
+                        }
+                        return;
+                    }
                     recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
                         @Override
                         public void onComplete() {
                         }
                     });
                 }
-            });
+            };
+            onListListener.onListUpdate(screenType, onUpdateListener);
         }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (recyclerAdapter != null && hidden) {
+            recyclerAdapter.search("");
+        }
+    }
+
+    public void setListener(OnListListener onListListener) {
+        this.onListListener = onListListener;
+    }
+
+    public interface OnListListener {
+        void onListUpdate(String fragmentName, OnUpdateListener onUpdateListener);
+    }
+
+    public interface OnUpdateListener {
+        void onUpdateComplete(ArrayList<String> projectIds);
     }
 }

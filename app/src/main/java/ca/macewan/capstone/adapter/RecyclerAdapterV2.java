@@ -167,7 +167,6 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                     int index = new ArrayList<String>(projects.keySet()).indexOf(projectId);
                     projects.remove(projectId);
                     notifyItemRemoved(index);
-                    search(searchTerm);
                 }
 
                 EventCompleteListener updateModifiedEvent = new EventCompleteListener() {
@@ -175,6 +174,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                     public void onComplete() {
                         currentProjectIds = new ArrayList<String>(newProjectIds);
                         lastRefresh = Timestamp.now();
+                        search(searchTerm);
                         eventCompleteListener.onComplete();
                     }
                 };
@@ -192,7 +192,6 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                 @Override
                 public void onComplete() {
                     if (addCounter == addedSize - 1) {
-                        search(searchTerm);
                         addingEvent.onComplete();
                     }
                     addCounter++;
@@ -212,7 +211,6 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                 @Override
                 public void onComplete() {
                     if (modifiedCounter == oldSize - 1) {
-                        search(searchTerm);
                         updateModifiedEvent.onComplete();
                     }
                     modifiedCounter++;

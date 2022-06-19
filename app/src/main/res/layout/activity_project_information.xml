@@ -27,4 +27,9 @@
                 layout="@layout/project_information" />
         </ScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+        android:id="@+id/profButtonsLayout"
+        android:visibility="gone"
+        layout="@layout/prof_buttons_layout"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

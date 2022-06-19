@@ -76,7 +76,7 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // remove the invitation from array
-                                userRef.update("invited", FieldValue.arrayRemove(projectRef));
+                                userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 projectRef.update("supervisorsPending", userRef);
                                 refreshButtons();
                             }
@@ -103,9 +103,9 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
                                 // add prof to supervisor list
                                 projectRef.update("supervisors", FieldValue.arrayUnion(userRef));
                                 // add request to accepted array
-                                userRef.update("projects", FieldValue.arrayUnion(projectRef));
+                                userRef.update("projects", FieldValue.arrayUnion(projectRef.getId()));
                                 // remove request from invited array
-                                userRef.update("invited", FieldValue.arrayRemove(projectRef));
+                                userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 refreshButtons();
                             }
                         })
@@ -143,8 +143,8 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    List<DocumentReference> invitedProjList = (List<DocumentReference>) task.getResult().get("invited");
-                    if (!invitedProjList.contains(projectRef)) {
+                    List<String> invitedProjList = (List<String>) task.getResult().get("invited");
+                    if (!invitedProjList.contains(projectRef.getId())) {
                         button_Decline.setEnabled(false);
                     }
                 }
@@ -165,8 +165,8 @@ public class ProjectInfoActivityProf extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    List<DocumentReference> invitedProjList = (List<DocumentReference>) task.getResult().get("invited");
-                    if (!invitedProjList.contains(projectRef)) {
+                    List<String> invitedProjList = (List<String>) task.getResult().get("invited");
+                    if (!invitedProjList.contains(projectRef.getId())) {
                         button_Accept.setEnabled(false);
                     }
                 }
