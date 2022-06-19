@@ -1,9 +1,11 @@
 package ca.macewan.capstone;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,7 +26,10 @@ public class Login extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private DocumentReference documentReference;
-
+    private CheckBox checkBoxRemember;
+    private SharedPreferences loginPrefs;
+    private SharedPreferences.Editor loginPrefsEditor;
+    private Boolean rememberLogin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +40,17 @@ public class Login extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editText_Password);
         buttonLogIn = findViewById(R.id.button_LogIn);
         buttonSignUp = findViewById(R.id.button_SignUp);
+        checkBoxRemember = findViewById(R.id.checkBox_Remember);
+        loginPrefs = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPrefsEditor = loginPrefs.edit();
+
+        rememberLogin = loginPrefs.getBoolean("rememberLogin", false);
+        if (rememberLogin == true) {
+            editTextUsername.setText(loginPrefs.getString("username", ""));
+            editTextPassword.setText(loginPrefs.getString("password", ""));
+            checkBoxRemember.setChecked(true);
+        }
+
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,6 +93,15 @@ public class Login extends AppCompatActivity {
                                     Toast toast = null;
                                     if (documentSnapshot.exists()) {
 //                                        User user = documentSnapshot.toObject(User.class);
+                                        if (checkBoxRemember.isChecked()) {
+                                            loginPrefsEditor.putBoolean("rememberLogin", true);
+                                            loginPrefsEditor.putString("username", username);
+                                            loginPrefsEditor.putString("password", password);
+                                            loginPrefsEditor.apply();
+                                        } else {
+                                            loginPrefsEditor.clear();
+                                            loginPrefsEditor.apply();
+                                        }
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 //                                        intent.putExtra("user", user);
                                         startActivity(intent);
