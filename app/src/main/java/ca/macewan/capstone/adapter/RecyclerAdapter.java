@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -35,14 +36,17 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
                 if (task.isSuccessful()) {
                     String creator = task.getResult().get("name") + " <" + task.getResult().get("email") + ">";
                     holder.textViewProjectCreator.setText(creator);
+
+                    if (!task.getResult().getBoolean("status"))
+                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
+                    else
+                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
                 }
             }
         });
         holder.textViewProjectName.setText(model.getName());
-        if (!model.getStatus())
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
-        else
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+        String term = model.getSemester() + " " + model.getYear();
+        holder.textView_pTerm.setText(term);
 
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);
@@ -60,21 +64,23 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
     }
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView textViewProjectName;
+        TextView textViewProjectName, textView_pTerm, textView_Tags;
 //        TextView textViewProjectDesc;
         TextView textViewProjectCreator;
 //        TextView textViewProjectMembers;
         View viewProgressBarBackground;
         ProgressBar progressBar;
-        MaterialCardView materialCardViewProject;
+        ImageView imageView_status;
 
         public ProjectViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewProjectName = itemView.findViewById(R.id.textView_pTitle);
             textViewProjectCreator = itemView.findViewById(R.id.textView_pCreator);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+            imageView_status = itemView.findViewById(R.id.imageView_status);
             viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
             progressBar = itemView.findViewById(R.id.progressBar);
+            textView_pTerm = itemView.findViewById(R.id.textView_pSemesterAndYear);
+            textView_Tags = itemView.findViewById(R.id.textView_pTags);
             itemView.setOnClickListener(this);
         }
 

@@ -18,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -126,7 +127,12 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
             @Override
             public void onComplete() {
                 recyclerViewProject.setAdapter(recyclerAdapter);
-                recyclerViewProject.setLayoutManager(new LinearLayoutManager(getActivity()));
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                recyclerViewProject.setLayoutManager(linearLayoutManager);
+                recyclerViewProject.setItemAnimator(null);
+                DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewProject.getContext(),
+                        linearLayoutManager.getOrientation());
+                recyclerViewProject.addItemDecoration(dividerItemDecoration);
                 recyclerAdapter.setOnProjectListener(new RecyclerAdapterV2.OnProjectListener() {
                     @Override
                     public void onProjectClick(int position, String projectID, Project project) {

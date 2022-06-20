@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -118,11 +119,13 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         Project project = projectsToDisplay.get(key);
         holder.textView_pTitle.setText(project.getName());
         holder.textView_pCreator.setText(project.getCreatorString());
+        String term = project.getSemester() + " " + project.getYear();
+        holder.textView_pTerm.setText(term);
 
         if (!project.getStatus())
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
+            holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
         else
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+            holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
 
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);
@@ -246,10 +249,10 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView textView_pCreator, textView_pTitle;
+        TextView textView_pCreator, textView_pTitle, textView_pTerm, textView_Tags;
         View viewProgressBarBackground;
         ProgressBar progressBar;
-        MaterialCardView materialCardViewProject;
+        ImageView imageView_status;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -257,7 +260,9 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
             this.textView_pTitle = itemView.findViewById(R.id.textView_pTitle);
             this.viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
             this.progressBar = itemView.findViewById(R.id.progressBar);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+            imageView_status = itemView.findViewById(R.id.imageView_status);
+            textView_pTerm = itemView.findViewById(R.id.textView_pSemesterAndYear);
+            textView_Tags = itemView.findViewById(R.id.textView_pTags);
             itemView.setOnClickListener(this);
         }
 

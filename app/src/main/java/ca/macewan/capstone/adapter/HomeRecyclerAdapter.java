@@ -54,9 +54,9 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
                     }
 
                     if (!snapshot.getBoolean("status"))
-                        holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
+                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
                     else
-                        holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
+                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
                 }
                 holder.viewProgressBarBackground.setVisibility(View.GONE);
                 holder.progressBar.setVisibility(View.GONE);
@@ -77,7 +77,7 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
         TextView textView_pTitle, textView_pSemesterAndYear, textView_pTags;
         View viewProgressBarBackground;
         ProgressBar progressBar;
-        MaterialCardView materialCardViewProject;
+        ImageView imageView_status;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,8 +85,8 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             this.textView_pSemesterAndYear = itemView.findViewById(R.id.textView_pSemesterAndYear);
             this.textView_pTags = itemView.findViewById(R.id.textView_pTags);
             this.viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
+            this.imageView_status = itemView.findViewById(R.id.imageView_status);
             this.progressBar = itemView.findViewById(R.id.progressBar);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
             textView_pTitle.setVisibility(View.VISIBLE);
             textView_pSemesterAndYear.setVisibility(View.VISIBLE);
             textView_pTags.setVisibility(View.VISIBLE);
