@@ -48,6 +48,9 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
         String term = model.getSemester() + " " + model.getYear();
         holder.textView_pTerm.setText(term);
 
+        for (String tag : model.getTags())
+            holder.textView_Tags.append(tag + " ");
+
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);
     }
