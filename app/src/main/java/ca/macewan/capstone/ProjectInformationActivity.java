@@ -71,7 +71,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
                 swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        update();
+                        updateProject();
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -130,7 +130,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
                                 userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 projectRef.update("supervisorsPending", userRef);
                                 profButtonsLayout.setVisibility(View.GONE);
-                                updateOptionsMenu();
+                                updateUser();
                             }
                         })
                         .show();
@@ -159,7 +159,8 @@ public class ProjectInformationActivity extends AppCompatActivity {
                                 // remove request from invited array
                                 userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 profButtonsLayout.setVisibility(View.GONE);
-                                updateOptionsMenu();
+                                updateProject();
+                                updateUser();
                             }
                         })
                         .show();
@@ -182,7 +183,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
         });
     }
 
-    private void update() {
+    private void updateProject() {
         projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -290,11 +291,11 @@ public class ProjectInformationActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_information_proposal, menu);
         this.menu = menu;
-        updateOptionsMenu();
+        updateUser();
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void updateOptionsMenu() {
+    private void updateUser() {
         db.collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getEmail())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -366,7 +367,10 @@ public class ProjectInformationActivity extends AppCompatActivity {
             SharedMethods.quitProject(userRef, projectRef, ProjectInformationActivity.this, new EventCompleteListener() {
                 @Override
                 public void onComplete() {
-                    updateOptionsMenu();
+                    // Update user to change options menu buttons if needed
+                    updateUser();
+                    // Update project to show any changes made
+                    updateProject();
                 }
             });
         } else if (id == R.id.action_delete) {
@@ -380,7 +384,10 @@ public class ProjectInformationActivity extends AppCompatActivity {
             SharedMethods.joinProject(userRef, projectRef, ProjectInformationActivity.this, new EventCompleteListener() {
                 @Override
                 public void onComplete() {
-                    updateOptionsMenu();
+                    // Update user to change options menu buttons if needed
+                    updateUser();
+                    // Update project to show any changes made
+                    updateProject();
                 }
             });
         }
