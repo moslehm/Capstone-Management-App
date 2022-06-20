@@ -12,12 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Capstone">
         <activity
-            android:name=".ProjectInformationActivity"
+            android:name=".ChangePasswordActivity"
             android:exported="false" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:label="Profile"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ProposalCreationActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ProposalEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProjectInformationActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
@@ -27,7 +42,6 @@
         <activity
             android:name=".ProjectInfoActivityProf"
             android:exported="true" />
-
         <activity
             android:name=".ProfMain"
             android:exported="true" />
@@ -40,6 +54,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Signup"
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -80,7 +80,6 @@ public class ProjectInfoActivity extends AppCompatActivity {
                                     db.collection("Users").document(email)
                                             .update("projects",
                                                     FieldValue.arrayUnion(projectRef));
-                                    System.out.println("Clicked yes on join");
                                     refreshButtons();
                                 }
                             })
@@ -108,7 +107,6 @@ public class ProjectInfoActivity extends AppCompatActivity {
                                 db.collection("Users").document(email)
                                         .update("projects",
                                                 FieldValue.arrayRemove(projectRef));
-                                System.out.println("Clicked yes on quit");
                                 refreshButtons();
                             }
                         })

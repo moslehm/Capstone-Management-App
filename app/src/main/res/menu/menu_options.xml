@@ -9,9 +9,7 @@
         app:actionViewClass="android.widget.SearchView"/>
 
     <item android:id="@+id/action_add"
-        android:title="Sort"
+        android:title="Add"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_add"/>
-
-
 </menu>

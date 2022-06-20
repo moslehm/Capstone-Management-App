@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -39,7 +41,7 @@ import ca.macewan.capstone.adapter.RecyclerAdapterV2;
 public class ProfAll extends Fragment implements RecyclerAdapter.OnProjectListener{
     private RecyclerView recyclerViewProject;
     private FirebaseFirestore db;
-//    private RecyclerAdapterV2 recyclerAdapterV2;
+    //    private RecyclerAdapterV2 recyclerAdapterV2;
     private RecyclerAdapter recyclerAdapter;
     ActivityResultLauncher<Intent> activityResultLauncher;
 

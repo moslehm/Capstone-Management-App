@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
     private EditText editTextUsername, editTextPassword;
-    private Button buttonLogIn;
+    private Button buttonLogIn, buttonSignUp;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private DocumentReference documentReference;
@@ -34,10 +34,17 @@ public class Login extends AppCompatActivity {
         editTextUsername = findViewById(R.id.editText_Username);
         editTextPassword = findViewById(R.id.editText_Password);
         buttonLogIn = findViewById(R.id.button_LogIn);
+        buttonSignUp = findViewById(R.id.button_SignUp);
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 logIn();
+            }
+        });
+        buttonSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signUp();
             }
         });
     }
@@ -45,6 +52,8 @@ public class Login extends AppCompatActivity {
     private void logIn() {
         String username = editTextUsername.getText().toString();
         String password = editTextPassword.getText().toString();
+        editTextUsername.clearFocus();
+        editTextPassword.clearFocus();
 
         if (username.equals("") || password.equals("")) {
             Toast toast = Toast.makeText(getApplicationContext(),
@@ -67,9 +76,7 @@ public class Login extends AppCompatActivity {
                                     DocumentSnapshot documentSnapshot = task.getResult();
                                     Toast toast = null;
                                     if (documentSnapshot.exists()) {
-//                                        User user = documentSnapshot.toObject(User.class);
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                                        intent.putExtra("user", user);
                                         startActivity(intent);
                                     }
                                     else {
@@ -90,5 +97,11 @@ public class Login extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void signUp() {
+        Intent intent = new Intent(getApplicationContext(), Signup.class);
+
+        startActivity(intent);
     }
 }

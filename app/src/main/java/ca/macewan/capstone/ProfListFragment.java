@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import ca.macewan.capstone.adapter.ViewPagerAdapter;
 
 public class ProfListFragment extends Fragment {
+    private ViewPagerAdapter adapter;
 
     public ProfListFragment() {
         // Required empty public constructor
@@ -37,11 +39,12 @@ public class ProfListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_prof_list, container, false);
+        String email = getArguments().getString("email");
 
         TabLayout tabLayout = view.findViewById(R.id.tl_main);
         ViewPager2 viewPager2 = view.findViewById(R.id.vp2_main);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(requireActivity());
+        adapter = new ViewPagerAdapter(requireActivity(), email);
         viewPager2.setAdapter(adapter);
 
 
@@ -62,20 +65,45 @@ public class ProfListFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflate menu
-        inflater.inflate(R.menu.menu_options, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        //inflate menu
+//        inflater.inflate(R.menu.menu_options, menu);
+//        MenuItem item = menu.findItem(R.id.app_bar_search);
+//        searchView = (SearchView) item.getActionView();
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                adapter.search(query);
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                adapter.search(newText);
+//                return false;
+//            }
+//        });
+//        System.out.println("onCreateOptionsMenu");
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_add) {
-            Intent menuIntent = new Intent(getActivity(), ProposalCreationActivity.class);
-            startActivity(menuIntent);
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.action_add) {
+//            Intent menuIntent = new Intent(getActivity(), ProposalCreationActivity.class);
+//            startActivity(menuIntent);
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
+
+//    @Override
+//    public void onHiddenChanged(boolean hidden) {
+//        super.onHiddenChanged(hidden);
+//        System.out.println("onHiddenChanged");
+//        if (searchView != null) {
+//            System.out.println("searchView");
+//        }
+//    }
 }

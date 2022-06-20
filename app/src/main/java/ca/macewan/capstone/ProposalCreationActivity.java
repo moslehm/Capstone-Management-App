@@ -58,8 +58,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observer;
 
+import ca.macewan.capstone.adapter.SharedMethods;
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
 
@@ -81,6 +83,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
     LinearLayout linearLayoutImages;
     private int downX;
     Button buttonSubmit;
+    private String userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,9 +92,11 @@ public class ProposalCreationActivity extends AppCompatActivity {
 
         // Get action bar and show back button
         assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle("Create Project");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         db = FirebaseFirestore.getInstance();
+        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
         String[] semesters = {"Fall", "Winter", "Spring", "Summer"};
         Spinner semestersSpinner = (Spinner) findViewById(R.id.spinnerSemester);
@@ -157,12 +162,11 @@ public class ProposalCreationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Setup Creator, Title, Description, semester, and supervisor values
-                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-                DocumentReference creator =  db.collection("Users").document(email);
+                DocumentReference creator =  db.collection("Users").document(userEmail);
                 String title = editTextTitle.getText().toString();
                 String description = editTextDescription.getText().toString();
                 String year = editTextYear.getText().toString();
-                Project project = new Project(creator, title, description, selectedSemester, year);
+                Project project = new Project(creator, title, description, selectedSemester, year, tags);
 
                 db.collection("Projects")
                     .add(project)
@@ -172,8 +176,8 @@ public class ProposalCreationActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 DocumentReference projectRef = task.getResult();
                                 inviteSupervisors(projectRef);
-                                creator.update("projects", FieldValue.arrayUnion(projectRef));
-                                projectRef.update("tags", tags);
+                                creator.update("projects", FieldValue.arrayUnion(projectRef.getId()));
+//                                projectRef.update("tags", tags);
                                 if (linearLayoutImages.getChildCount() - 1 == 0) {
                                     finish();
                                 }
@@ -212,9 +216,9 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                             for (Object object : objects) {
                                                 Uri uri = (Uri) object;
                                                 imagePaths.add(uri.toString());
-                                                finish();
                                             }
                                             projectRef.update("imagePaths", imagePaths);
+                                            finish();
                                         }
                                     });
                                 }
@@ -228,9 +232,15 @@ public class ProposalCreationActivity extends AppCompatActivity {
     private void inviteSupervisors(DocumentReference projectRef) {
        for (int i = 0; i < arrayListSupervisors.size(); i++) {
             if (selectedSupervisors[i]) {
-                DocumentReference supervisor = db.collection("Users").document(arrayListSupervisors.get(i).email);
-                supervisor.update("invited", FieldValue.arrayUnion(projectRef));
-                projectRef.update("supervisorsInvited", FieldValue.arrayUnion(supervisor));
+                String supervisorEmail = arrayListSupervisors.get(i).email;
+                DocumentReference supervisor = db.collection("Users").document(supervisorEmail);
+                if (supervisorEmail.equals(userEmail)) {
+                    supervisor.update("projects", FieldValue.arrayUnion(projectRef.getId()));
+                    projectRef.update("supervisors", FieldValue.arrayUnion(supervisor));
+                    continue;
+                }
+                supervisor.update("invited", FieldValue.arrayUnion(projectRef.getId()));
+                projectRef.update("supervisorsPending", FieldValue.arrayUnion(supervisor));
             }
         }
     }

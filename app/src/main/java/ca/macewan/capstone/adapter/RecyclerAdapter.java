@@ -4,7 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,15 +39,13 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
             }
         });
         holder.textViewProjectName.setText(model.getName());
-//        if (!model.getStatus())
-//            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
-//        else
-//            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
         if (!model.getStatus())
-            holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
+            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
         else
-            holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
+            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
 
+        holder.viewProgressBarBackground.setVisibility(View.GONE);
+        holder.progressBar.setVisibility(View.GONE);
     }
 
     public void setOnProjectListener(OnProjectListener onProjectListener) {
@@ -66,14 +64,17 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
 //        TextView textViewProjectDesc;
         TextView textViewProjectCreator;
 //        TextView textViewProjectMembers;
+        View viewProgressBarBackground;
+        ProgressBar progressBar;
+        MaterialCardView materialCardViewProject;
 
-        ImageView imageView_status;
         public ProjectViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewProjectName = itemView.findViewById(R.id.textView_pTitle);
             textViewProjectCreator = itemView.findViewById(R.id.textView_pCreator);
-//            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
-            imageView_status = itemView.findViewById(R.id.imageView_status);
+            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+            viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
+            progressBar = itemView.findViewById(R.id.progressBar);
             itemView.setOnClickListener(this);
         }
 
