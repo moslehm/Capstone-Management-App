@@ -14,24 +14,24 @@
         android:paddingEnd="2dp"
         android:text="Title"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/textView_pSemesterAndYear"
+        app:layout_constraintBottom_toTopOf="@id/textView_pCreator"
+        app:layout_constraintEnd_toStartOf="@id/imageView_status"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/imageView_status"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView_pSemesterAndYear"
+        android:id="@+id/textView_pCreator"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
-        android:text="Semester and year"
+        android:text="creator"
         android:textSize="16sp"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@id/textView_pTags"
-        app:layout_constraintStart_toEndOf="@id/imageView_pTerm"
-        app:layout_constraintTop_toBottomOf="@id/textView_pTitle"
-        app:layout_constraintEnd_toStartOf="@id/imageView_status"/>
+        app:layout_constraintBottom_toTopOf="@id/textView_pSemesterAndYear"
+        app:layout_constraintEnd_toStartOf="@id/imageView_status"
+        app:layout_constraintStart_toEndOf="@id/imageView_pCreator"
+        app:layout_constraintTop_toBottomOf="@id/textView_pTitle" />
 
     <TextView
         android:id="@+id/textView_pTags"
@@ -42,14 +42,14 @@
         android:text="Tags"
         android:textSize="16sp"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@id/textView_pCreator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imageView_status"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_pSemesterAndYear"
-        app:layout_constraintEnd_toStartOf="@id/imageView_status"/>
+        app:layout_constraintTop_toBottomOf="@id/textView_pSemesterAndYear" />
 
 
     <TextView
-        android:id="@+id/textView_pCreator"
+        android:id="@+id/textView_pSemesterAndYear"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -57,31 +57,31 @@
         android:paddingEnd="2dp"
         android:text="Creator"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textView_pTags"
+        app:layout_constraintEnd_toStartOf="@id/imageView_status"
         app:layout_constraintStart_toEndOf="@id/imageView_pCreator"
-        app:layout_constraintTop_toBottomOf="@+id/textView_pTags"
-        app:layout_constraintEnd_toStartOf="@id/imageView_status"/>
-
-    <ImageView
-        android:id="@+id/imageView_pCreator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/textView_pCreator"
-        app:layout_constraintEnd_toStartOf="@+id/textView_pCreator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView_pCreator"
-        app:srcCompat="@drawable/ic_baseline_person_24" />
+        app:layout_constraintTop_toBottomOf="@id/textView_pCreator" />
 
     <ImageView
         android:id="@+id/imageView_pTerm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/textView_pTags"
-        app:layout_constraintEnd_toStartOf="@id/textView_pSemesterAndYear"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/textView_pCreator"
+        app:layout_constraintEnd_toStartOf="@+id/textView_pSemesterAndYear"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textView_pTags"
+        app:srcCompat="@drawable/ic_baseline_calendar_month_24" />
+
+    <ImageView
+        android:id="@+id/imageView_pCreator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/textView_pSemesterAndYear"
+        app:layout_constraintEnd_toStartOf="@id/textView_pCreator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView_pTitle"
-        app:srcCompat="@drawable/ic_baseline_calendar_month_24" />
+        app:srcCompat="@drawable/ic_baseline_person_24" />
 
             <View
                 android:id="@+id/viewProgressBarBackground"
