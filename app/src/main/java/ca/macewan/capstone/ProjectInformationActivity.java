@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +45,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
     private View projectView;
     private View profButtonsLayout;
     private boolean isSupervisor;
+    private View markAsCompleteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,31 @@ public class ProjectInformationActivity extends AppCompatActivity {
         userRef = db.collection("Users").document(email);
         projectView = findViewById(R.id.projectLayout);
         profButtonsLayout = findViewById(R.id.profButtonsLayout);
+        markAsCompleteButton = projectView.findViewById(R.id.markAsCompleteButton);
+        markAsCompleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialAlertDialogBuilder(ProjectInformationActivity.this)
+                    .setMessage("Mark project as complete?")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Move project id to from projects to completed
+                            userRef.update("completed", FieldValue.arrayUnion(projectRef.getId()));
+                            userRef.update("projects", FieldValue.arrayRemove(projectRef.getId()));
+                            // Add project to the "Complete" collection and remove it from Projects
+                            projectRef.update("isComplete", true);
+                            finish();
+                        }
+                    })
+                    .show();
+            }
+        });
 
         project = getIntent().getExtras().getParcelable("project");
         if (project != null && !isSupervisor) {
@@ -210,7 +237,6 @@ public class ProjectInformationActivity extends AppCompatActivity {
         MaterialTextView textViewTags = (MaterialTextView) projectView.findViewById(R.id.textViewTags);
         View textViewImages = projectView.findViewById(R.id.textViewImages);
         LinearLayout linearLayoutImages = (LinearLayout) projectView.findViewById(R.id.linearLayoutImages);
-        CheckBox checkBoxStatus = (CheckBox) projectView.findViewById(R.id.checkBox_StatusProf);
 
         textViewTitle.setContentText(project.getName(), null);
         textViewCreator.setContentText(project.getCreatorString(), null);
@@ -315,44 +341,48 @@ public class ProjectInformationActivity extends AppCompatActivity {
         menu.findItem(R.id.action_quit).setVisible(false);
         menu.findItem(R.id.action_join).setVisible(false);
 
-        boolean userJoined = false;
-        if (user.projects != null) {
-            for (String projectId : user.projects) {
-                if (projectId.equals(projectRef.getId())) {
-                    userJoined = true;
-                    break;
+        if (!project.getIsComplete()) {
+            boolean userJoined = false;
+            if (user.projects != null) {
+                for (String projectId : user.projects) {
+                    if (projectId.equals(projectRef.getId())) {
+                        userJoined = true;
+                        break;
+                    }
+                }
+                if (!userJoined) {
+                    if (!isSupervisor)
+                        menu.findItem(R.id.action_join).setVisible(true);
+                    return;
                 }
             }
-            if (!userJoined) {
-                if (!isSupervisor)
-                    menu.findItem(R.id.action_join).setVisible(true);
-                return;
-            }
-        }
 
-        projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    task.getResult()
-                            .getDocumentReference("creator")
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        String creatorEmail = task.getResult().getString("email");
-                                        if (Objects.equals(creatorEmail, email))
-                                            menu.findItem(R.id.action_delete).setVisible(true);
-                                        else
-                                            menu.findItem(R.id.action_quit).setVisible(true);
-                                        menu.findItem(R.id.action_edit).setVisible(true);
+            projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        task.getResult()
+                                .getDocumentReference("creator")
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            String creatorEmail = task.getResult().getString("email");
+                                            if (Objects.equals(creatorEmail, email)) {
+                                                menu.findItem(R.id.action_delete).setVisible(true);
+                                                markAsCompleteButton.setVisibility(View.VISIBLE);
+                                            } else {
+                                                menu.findItem(R.id.action_quit).setVisible(true);
+                                            }
+                                            menu.findItem(R.id.action_edit).setVisible(true);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

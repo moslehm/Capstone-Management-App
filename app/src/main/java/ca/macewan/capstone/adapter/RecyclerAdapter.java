@@ -39,11 +39,6 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
             }
         });
         holder.textViewProjectName.setText(model.getName());
-        if (!model.getStatus())
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
-        else
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
-
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);
     }

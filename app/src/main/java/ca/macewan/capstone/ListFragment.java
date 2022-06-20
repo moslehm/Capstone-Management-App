@@ -121,7 +121,7 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     }
 
     private void createAdapter(ArrayList<String> projectIds) {
-        recyclerAdapter = new RecyclerAdapterV2(projectIds, new EventCompleteListener() {
+        recyclerAdapter = new RecyclerAdapterV2(projectIds, screenType, new EventCompleteListener() {
             @Override
             public void onComplete() {
                 recyclerViewProject.setAdapter(recyclerAdapter);
@@ -155,7 +155,7 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
             //inflate menu
             inflater.inflate(R.menu.menu_options, menu);
             MenuItem item = menu.findItem(R.id.app_bar_search);
-            if (Objects.equals(screenType, "homeList")) {
+            if (Objects.equals(screenType, "homeList") || Objects.equals(screenType, "completedList")) {
                 menu.findItem(R.id.action_add).setVisible(false);
             }
             searchView = (SearchView) item.getActionView();

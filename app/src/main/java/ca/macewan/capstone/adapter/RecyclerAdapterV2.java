@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import ca.macewan.capstone.EventCompleteListener;
 import ca.macewan.capstone.Project;
@@ -33,6 +34,7 @@ import ca.macewan.capstone.R;
 
 public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.ViewHolder> {
     private final FirebaseFirestore db;
+    private String screenType;
     private int addCounter;
     private int modifiedCounter;
     LinkedHashMap<String, Project> projects;
@@ -50,8 +52,9 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         projectsToDisplay = new LinkedHashMap<String, Project>();
     }
 
-    public RecyclerAdapterV2(List<String> projectIds, EventCompleteListener eventCompleteListener) {
+    public RecyclerAdapterV2(List<String> projectIds, String screenType, EventCompleteListener eventCompleteListener) {
         db = FirebaseFirestore.getInstance();
+        this.screenType = screenType;
         projects = new LinkedHashMap<String, Project>();
         projectsToDisplay = new LinkedHashMap<String, Project>();
         currentProjectIds = new ArrayList<String>();
@@ -61,7 +64,8 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     }
 
     private void addProject(String projectId, EventCompleteListener eventCompleteListener) {
-        DocumentReference projectRef = db.collection("Projects").document(projectId);
+        DocumentReference projectRef;
+        projectRef = db.collection("Projects").document(projectId);
         projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -118,11 +122,6 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         Project project = projectsToDisplay.get(key);
         holder.textView_pTitle.setText(project.getName());
         holder.textView_pCreator.setText(project.getCreatorString());
-
-        if (!project.getStatus())
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
-        else
-            holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
 
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);

@@ -260,20 +260,20 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
     @Override
     public void onListUpdate(String fragmentName, ListFragment.OnUpdateListener onUpdateListener) {
         db.collection("Users")
-                .document(email)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            projectIds = (ArrayList<String>) task.getResult().get("projects");
-                            if (projectIds == null) {
-                                onUpdateListener.onUpdateComplete(new ArrayList<String>());
-                            } else {
-                                onUpdateListener.onUpdateComplete(projectIds);
-                            }
+            .document(email)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        projectIds = (ArrayList<String>) task.getResult().get("projects");
+                        if (projectIds == null) {
+                            onUpdateListener.onUpdateComplete(new ArrayList<String>());
+                        } else {
+                            onUpdateListener.onUpdateComplete(projectIds);
                         }
                     }
-                });
+                }
+            });
     }
 }

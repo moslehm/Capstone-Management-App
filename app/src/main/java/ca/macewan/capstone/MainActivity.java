@@ -127,20 +127,19 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
     @Override
     public void onListUpdate(String fragmentName, ListFragment.OnUpdateListener onUpdateListener) {
         ArrayList<String> projectIds = new ArrayList<String>();
-        if (Objects.equals(fragmentName, "list")) {
-            db.collection("Projects")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                projectIds.add(document.getId());
-                            }
-                            onUpdateListener.onUpdateComplete(projectIds);
+        db.collection("Projects")
+            .whereEqualTo("isComplete", false)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            projectIds.add(document.getId());
                         }
+                        onUpdateListener.onUpdateComplete(projectIds);
                     }
-                });
-        }
+                }
+            });
     }
 }

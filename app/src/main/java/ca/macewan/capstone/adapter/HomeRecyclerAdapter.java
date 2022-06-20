@@ -52,11 +52,6 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
                     if (tagsList != null) {
                         holder.textView_pTags.setText(android.text.TextUtils.join(", ", tagsList));
                     }
-
-                    if (!snapshot.getBoolean("status"))
-                        holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#fdaaaa"));
-                    else
-                        holder.materialCardViewProject.setCardBackgroundColor(Color.parseColor("#77DD77"));
                 }
                 holder.viewProgressBarBackground.setVisibility(View.GONE);
                 holder.progressBar.setVisibility(View.GONE);

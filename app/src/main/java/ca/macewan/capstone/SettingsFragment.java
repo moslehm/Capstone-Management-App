@@ -33,7 +33,7 @@ public class SettingsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    private TextView textProfile, textPreferences, textHelp, textAbout, textSignout;
+    private TextView textProfile, textPreferences, textProjects, textHelp, textAbout, textSignout;
 
     /**
      * Use this factory method to create a new instance of
@@ -74,6 +74,7 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         textProfile = getView().findViewById(R.id.settingsProfile);
         textPreferences = getView().findViewById(R.id.settingsPreferences);
+        textProjects = getView().findViewById(R.id.settingsProjects);
         textHelp = getView().findViewById(R.id.settingsHelp);
         textAbout = getView().findViewById(R.id.settingsAbout);
         textSignout = getView().findViewById(R.id.settingsSignOut);
@@ -90,6 +91,14 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        textProjects.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), CompletedProjectsActivity.class);
                 startActivity(intent);
             }
         });
