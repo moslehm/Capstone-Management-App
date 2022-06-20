@@ -107,7 +107,6 @@ public class ProjectInformationActivity extends AppCompatActivity {
                 }
             });
         }
-//        SharedMethods.setupProjectView(projectView, projectRef, email, this);
     }
 
     private void profButtonsSetUp() {
@@ -394,13 +393,4 @@ public class ProjectInformationActivity extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        if (swipeRefreshLayout!=null) {
-//            swipeRefreshLayout.setRefreshing(false);
-//            swipeRefreshLayout.destroyDrawingCache();
-//            swipeRefreshLayout.clearAnimation();
-//        }
-//    }
 }

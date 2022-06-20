@@ -271,9 +271,9 @@ public class SharedMethods {
         return list == null || list.size() == 0;
     }
 
-    public static void createFragment(FragmentManager supportFragmentManager, Fragment fragment, String tag){
+    public static void createFragment(FragmentManager supportFragmentManager, int id, Fragment fragment, String tag){
         supportFragmentManager.beginTransaction()
-                .add(R.id.fl_wrapper, fragment, tag)
+                .add(id, fragment, tag)
                 .hide(fragment)
                 .commit();
     }

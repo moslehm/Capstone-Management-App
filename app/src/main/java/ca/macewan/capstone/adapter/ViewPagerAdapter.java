@@ -24,8 +24,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
     private final String email;
 
 
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, String email) {
-        super(fragmentActivity);
+    public ViewPagerAdapter(@NonNull Fragment fragment, String email) {
+        super(fragment);
         this.email = email;
     }
 
@@ -46,6 +46,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
         listFragment.setArguments(bundle);
         return listFragment;
     }
+
+
 
     @Override
     public int getItemCount() {

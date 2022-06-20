@@ -177,7 +177,6 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                 DocumentReference projectRef = task.getResult();
                                 inviteSupervisors(projectRef);
                                 creator.update("projects", FieldValue.arrayUnion(projectRef.getId()));
-//                                projectRef.update("tags", tags);
                                 if (linearLayoutImages.getChildCount() - 1 == 0) {
                                     finish();
                                 }

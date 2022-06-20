@@ -98,11 +98,8 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
     private void setupAllFragments() {
         Bundle bundle = new Bundle();
         bundle.putString("email", user.email);
-//        bundle.putString("screenType", "home");
-//        bundle.putBoolean("isSupervisor", false);
         homeFragment = new HomeFragment();
         homeFragment.setArguments(bundle);
-//        ((ListFragment) homeFragment).setListener(this);
 
         if (Objects.equals(user.role, "student")) {
             bundle = new Bundle();
@@ -121,9 +118,9 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
         settingsFragment = new SettingsFragment();
         selected = homeFragment;
 
-        SharedMethods.createFragment(getSupportFragmentManager(), homeFragment, "home");
-        SharedMethods.createFragment(getSupportFragmentManager(), listFragment, "list");
-        SharedMethods.createFragment(getSupportFragmentManager(), settingsFragment, "settings");
+        SharedMethods.createFragment(getSupportFragmentManager(), R.id.fl_wrapper, homeFragment, "home");
+        SharedMethods.createFragment(getSupportFragmentManager(), R.id.fl_wrapper, listFragment, "list");
+        SharedMethods.createFragment(getSupportFragmentManager(), R.id.fl_wrapper, settingsFragment, "settings");
         SharedMethods.showFragment(getSupportFragmentManager(), selected);
     }
 
@@ -145,23 +142,5 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
                     }
                 });
         }
-//        else if (Objects.equals(fragmentName, "home")) {
-//            db.collection("Users")
-//                    .document(user.email)
-//                    .get()
-//                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                ArrayList<String> projectIds = (ArrayList<String>) task.getResult().get("projects");
-//                                if (projectIds == null) {
-//                                    onUpdateListener.onUpdateComplete(new ArrayList<String>());
-//                                } else {
-//                                    onUpdateListener.onUpdateComplete(projectIds);
-//                                }
-//                            }
-//                        }
-//                    });
-//        }
     }
 }

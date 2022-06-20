@@ -272,27 +272,4 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     public interface OnProjectListener {
         void onProjectClick(int position, String projectID, Project project);
     }
-
-//    public void updateList(LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        notifyDataSetChanged();
-//    }
-//
-//    public void updateItem(String key, LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        int index = new ArrayList<String>(projects.keySet()).indexOf(key);
-//        notifyItemChanged(index);
-//    }
-//
-//    public void addItem(String key, LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        int index = new ArrayList<String>(projects.keySet()).indexOf(key);
-//        notifyItemInserted(index);
-//    }
-//
-//    public void removeItem(String key, LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        int index = new ArrayList<String>(projects.keySet()).indexOf(key);
-//        notifyItemRemoved(index);
-//    }
 }

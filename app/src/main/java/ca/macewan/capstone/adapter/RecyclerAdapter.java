@@ -61,9 +61,7 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textViewProjectName;
-//        TextView textViewProjectDesc;
         TextView textViewProjectCreator;
-//        TextView textViewProjectMembers;
         View viewProgressBarBackground;
         ProgressBar progressBar;
         MaterialCardView materialCardViewProject;
