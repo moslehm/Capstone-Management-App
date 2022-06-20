@@ -60,6 +60,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         if (Objects.equals(fragmentName, "all")) {
             db.collection("Projects")
+                    .whereEqualTo("isComplete", false)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
