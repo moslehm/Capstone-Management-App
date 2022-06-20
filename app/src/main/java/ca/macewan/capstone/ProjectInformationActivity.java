@@ -23,6 +23,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -105,6 +107,29 @@ public class ProjectInformationActivity extends AppCompatActivity {
                             userRef.update("projects", FieldValue.arrayRemove(projectRef.getId()));
                             // Add project to the "Complete" collection and remove it from Projects
                             projectRef.update("isComplete", true);
+                            // Remove supervisor and members in project
+                            db.collection("Users").whereArrayContains("projects", projectID)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            for (QueryDocumentSnapshot supervisor : task.getResult()) {
+                                                supervisor.getReference().update("projects", FieldValue.arrayRemove(projectRef.getId()));
+                                                supervisor.getReference().update("completed", FieldValue.arrayUnion(projectRef.getId()));
+                                            }
+                                        }
+                                    });
+                            // Remove invites from professors
+                            db.collection("Users").whereArrayContains("invited", projectID)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            for (QueryDocumentSnapshot supervisor : task.getResult()) {
+                                                supervisor.getReference().update("invited", FieldValue.arrayRemove(projectRef.getId()));
+                                            }
+                                        }
+                                    });
                             finish();
                         }
                     })
@@ -271,7 +296,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
 
         if (SharedMethods.listIsEmpty(supervisorsStringList)) {
             // No supervisors, check if any are pending
-            if (SharedMethods.listIsEmpty(supervisorsPendingStringList)) {
+            if (SharedMethods.listIsEmpty(supervisorsPendingStringList) || project.getIsComplete()) {
                 textViewSupervisors.setContentText("None", null);
                 return;
             }
