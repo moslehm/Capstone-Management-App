@@ -3,15 +3,30 @@ package ca.macewan.capstone;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.style.TabStopSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +49,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private TextView textProfile, textPreferences, textHelp, textAbout, textSignout;
+    private Button testNotifs;
 
     /**
      * Use this factory method to create a new instance of
@@ -77,6 +93,7 @@ public class SettingsFragment extends Fragment {
         textHelp = getView().findViewById(R.id.settingsHelp);
         textAbout = getView().findViewById(R.id.settingsAbout);
         textSignout = getView().findViewById(R.id.settingsSignOut);
+        testNotifs = getView().findViewById(R.id.testNotification);
 
         textProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,5 +137,48 @@ public class SettingsFragment extends Fragment {
                 startActivity(new Intent(getActivity(), Login.class));
             }
         });
+
+        testNotifs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseMessaging.getInstance().getToken()
+                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
+                                if (!task.isSuccessful()) {
+                                    return;
+                                }
+                                String token = task.getResult();
+                                tokenThread(token);
+                            }
+                        });
+            }
+        });
+    }
+
+    private void tokenThread(final String token) {
+        Thread t = new Thread(() -> {
+            try {
+                sendToken(token);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+    }
+
+    private void sendToken(String token) throws IOException, JSONException {
+        Socket socket = null;
+        OutputStreamWriter output = null;
+        socket = new Socket("34.168.78.99", 10000);
+        System.out.println("Connected");
+        output = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        output.write(json.toString());
+        output.close();
+        socket.close();
     }
 }

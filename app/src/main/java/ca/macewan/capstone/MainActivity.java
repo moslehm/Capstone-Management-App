@@ -45,18 +45,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setup();
 
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            return;
-                        }
-                        String token = task.getResult();
-                        tokenThread(token);
-                    }
-                });
-
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
@@ -139,24 +127,5 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .hide(fragment)
                 .commit();
-    }
-
-    private void tokenThread(final String token) {
-        Thread t = new Thread(() -> {
-            try {
-                sendToken(token);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        t.start();
-    }
-
-    private void sendToken(String token) throws IOException {
-        Socket socket = null;
-        OutputStream output = null;
-        socket = new Socket("34.168.78.99", 10000);
-        System.out.println("Connected");
-        output = socket.getOutputStream();
     }
 }
