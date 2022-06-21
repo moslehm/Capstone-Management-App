@@ -126,7 +126,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
             holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
         else
             holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
-
+        holder.textView_Tags.setText(null);
         for (String tag : project.getTags())
             holder.textView_Tags.append(tag + " ");
         holder.viewProgressBarBackground.setVisibility(View.GONE);
