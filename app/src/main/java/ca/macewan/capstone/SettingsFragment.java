@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.text.style.TabStopSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +47,6 @@ public class SettingsFragment extends Fragment {
     }
 
     private TextView textProfile, textPreferences, textHelp, textAbout, textSignout;
-    private Button testNotifs;
 
     /**
      * Use this factory method to create a new instance of
@@ -93,7 +90,6 @@ public class SettingsFragment extends Fragment {
         textHelp = getView().findViewById(R.id.settingsHelp);
         textAbout = getView().findViewById(R.id.settingsAbout);
         textSignout = getView().findViewById(R.id.settingsSignOut);
-        testNotifs = getView().findViewById(R.id.testNotification);
 
         textProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,25 +118,8 @@ public class SettingsFragment extends Fragment {
         textAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Clicked About!",
-                        Toast.LENGTH_SHORT);
-            }
-        });
-
-        textSignout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(), "Signing Out!",
-                        Toast.LENGTH_SHORT);
-
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getActivity(), Login.class));
-            }
-        });
-
-        testNotifs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                Toast.makeText(getActivity(), "Surprise, we're sending a notification!",
+                        Toast.LENGTH_SHORT).show();
                 FirebaseMessaging.getInstance().getToken()
                         .addOnCompleteListener(new OnCompleteListener<String>() {
                             @Override
@@ -152,6 +131,17 @@ public class SettingsFragment extends Fragment {
                                 tokenThread(token);
                             }
                         });
+            }
+        });
+
+        textSignout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Signing Out!",
+                        Toast.LENGTH_SHORT);
+
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getActivity(), Login.class));
             }
         });
     }
@@ -177,6 +167,8 @@ public class SettingsFragment extends Fragment {
         output = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
         JSONObject json = new JSONObject();
         json.put("token", token);
+        json.put("topicA", "notifsEnabled");
+        json.put("topicB", "projectJoin");
         output.write(json.toString());
         output.close();
         socket.close();

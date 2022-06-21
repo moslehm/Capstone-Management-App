@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -64,7 +65,7 @@ public class FirebaseMessaging extends FirebaseMessagingService {
                 channel_id)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(com.google.firebase.database.collection.R.drawable.common_google_signin_btn_icon_light_normal)
+                .setSmallIcon(R.drawable.ic_home)
                 .setAutoCancel(true)
                 .setSound(ringtone)
                 .setVibrate(new long[]{1000, 1000, 1000,
