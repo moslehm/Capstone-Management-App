@@ -65,7 +65,7 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
             super(itemView);
             textViewProjectName = itemView.findViewById(R.id.textView_pTitle);
             textViewProjectCreator = itemView.findViewById(R.id.textView_pCreator);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+//            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
 //            viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
 //            progressBar = itemView.findViewById(R.id.progressBar);
             itemView.setOnClickListener(this);

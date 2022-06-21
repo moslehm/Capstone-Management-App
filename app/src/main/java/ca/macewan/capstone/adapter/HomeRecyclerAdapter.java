@@ -81,7 +81,7 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
             this.textView_pTags = itemView.findViewById(R.id.textView_pTags);
 //            this.viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
 //            this.progressBar = itemView.findViewById(R.id.progressBar);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+//            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
             textView_pTitle.setVisibility(View.VISIBLE);
             textView_pSemesterAndYear.setVisibility(View.VISIBLE);
             textView_pTags.setVisibility(View.VISIBLE);

@@ -125,6 +125,9 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
 
 //        holder.viewProgressBarBackground.setVisibility(View.GONE);
 //        holder.progressBar.setVisibility(View.GONE);
+        holder.textView_Tags.setText(null);
+        for (String tag : project.getTags())
+            holder.textView_Tags.append(tag + " ");
     }
 
     public static String getHashMapKeyFromIndex(HashMap hashMap, int index) {
@@ -250,16 +253,18 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView textView_pCreator, textView_pTitle;
+        TextView textView_pCreator, textView_pTitle, textView_pTerm, textView_Tags;
         View viewProgressBarBackground;
         ProgressBar progressBar;
-        MaterialCardView materialCardViewProject;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.textView_pCreator = itemView.findViewById(R.id.textView_pCreator);
             this.textView_pTitle = itemView.findViewById(R.id.textView_pTitle);
-            materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
+            this.viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
+            this.progressBar = itemView.findViewById(R.id.progressBar);
+            textView_pTerm = itemView.findViewById(R.id.textView_pSemesterAndYear);
+            textView_Tags = itemView.findViewById(R.id.textView_pTags);
             itemView.setOnClickListener(this);
         }
 
