@@ -2,7 +2,6 @@ package ca.macewan.capstone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.loader.content.AsyncTaskLoader;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,30 +22,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.remote.Stream;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ProfileActivity extends AppCompatActivity {
-    Bitmap picBitmap;
     FirebaseAuth firebaseAuth;
     ImageView profilePicture;
     EditText editName, editEmail, editPhone;
-    TextView changePassword, role, profAvail, changePhoto;
+    TextView changePassword, role, profAvail, changePhoto, deleteAccount;
     ChipGroup profAvailChips;
     Menu menu;
     DocumentReference user;
@@ -68,40 +63,42 @@ public class ProfileActivity extends AppCompatActivity {
         profAvail = findViewById(R.id.profileProfAvail);
         profAvailChips = findViewById(R.id.profileProfAvailChips);
 
-        changePassword = findViewById(R.id.profilePassword);
         profilePicture = findViewById(R.id.profilePicture);
         profilePicture.setImageResource(R.drawable.ic_baseline_person_24);
+
+        changePassword = findViewById(R.id.profilePassword);
+        deleteAccount = findViewById(R.id.profileDelete);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
         user = FirebaseFirestore.getInstance().collection("Users").document(firebaseAuth.getCurrentUser().getEmail());
-        user.get()
-            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        User user = task.getResult().toObject(User.class);
+            user.get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                User user = task.getResult().toObject(User.class);
 
-                        role.setText(user.role);
+                                role.setText(user.role);
 
-                        if (user.picture != null) {
-                            BitmapAsync bitmapAsync = new BitmapAsync();
-                            bitmapAsync.execute(user.picture);
+                                if (user.picture != null) {
+                                    BitmapAsync bitmapAsync = new BitmapAsync();
+                                    bitmapAsync.execute(user.picture);
+                                }
+
+                                editName.setText(user.name);
+                                editEmail.setText(user.email);
+                                editPhone.setText(user.phone);
+
+                                if (user.role.equals("professor")) {
+                                    profAvail.setVisibility(View.VISIBLE);
+                                    profAvailChips.setVisibility(View.VISIBLE);
+                                }
+                            } else {
+                                finish();
+                            }
                         }
-
-                        editName.setText(user.name);
-                        editEmail.setText(user.email);
-                        editPhone.setText(user.phone);
-
-                        if (user.role.equals("professor")) {
-                            profAvail.setVisibility(View.VISIBLE);
-                            profAvailChips.setVisibility(View.VISIBLE);
-                        }
-                    } else {
-                        finish();
-                    }
-                }
-            });
+                    });
 
         changePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +111,13 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 changePassword();
+            }
+        });
+
+        deleteAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //delete acc
             }
         });
     }
