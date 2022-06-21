@@ -3,10 +3,19 @@ package ca.macewan.capstone;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.widget.CheckBox;
+
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -44,9 +53,32 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class PreferencesFragment extends PreferenceFragmentCompat {
+        CheckBoxPreference notifsMaster, notifsJoin, notifsSupervisorAccept;
+        SharedPreferences prefs;
+
+        Preference.OnPreferenceChangeListener notifListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (newValue == Boolean.FALSE) {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(preference.getKey());
+                } else {
+                    FirebaseMessaging.getInstance().subscribeToTopic(preference.getKey());
+                }
+                return false;
+            }
+        };
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences, rootKey);
+            notifsMaster.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    return false;
+                }
+            });
+
+            System.out.print(prefs.getAll());
         }
     }
 }
