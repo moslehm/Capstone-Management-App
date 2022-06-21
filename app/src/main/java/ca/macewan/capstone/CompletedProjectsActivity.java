@@ -33,6 +33,7 @@ public class CompletedProjectsActivity extends AppCompatActivity implements List
         bundle.putString("email", email);
         bundle.putString("screenType", "completedList");
         bundle.putBoolean("isSupervisor", false);
+        bundle.putString("emptyListText", "There are no completed projects to display.");
         ListFragment listFragment = new ListFragment();
         listFragment.setArguments(bundle);
         listFragment.setListener(this);

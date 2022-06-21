@@ -77,7 +77,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                         @Override
                         public void onComplete() {
                             projects.put(projectId, project);
-                            notifyItemInserted(new ArrayList<String>(projects.keySet()).indexOf(projectId));
+                            notifyItemInserted(convertIdToIndex(projectId));
                             eventCompleteListener.onComplete();
                         }
                     });
@@ -123,8 +123,8 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         holder.textView_pTitle.setText(project.getName());
         holder.textView_pCreator.setText(project.getCreatorString());
 
-        holder.viewProgressBarBackground.setVisibility(View.GONE);
-        holder.progressBar.setVisibility(View.GONE);
+//        holder.viewProgressBarBackground.setVisibility(View.GONE);
+//        holder.progressBar.setVisibility(View.GONE);
     }
 
     public static String getHashMapKeyFromIndex(HashMap hashMap, int index) {
@@ -163,7 +163,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
             public void onComplete() {
                 // This will run after all the new documents have been added
                 for (String projectId : removed) {
-                    int index = new ArrayList<String>(projects.keySet()).indexOf(projectId);
+                    int index = convertIdToIndex(projectId);
                     projects.remove(projectId);
                     notifyItemRemoved(index);
                 }
@@ -233,7 +233,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                             @Override
                             public void onComplete() {
                                 projects.put(projectId, project);
-                                notifyItemChanged(new ArrayList<String>(projects.keySet()).indexOf(projectId));
+                                notifyItemChanged(convertIdToIndex(projectId));
                                 eventCompleteListener.onComplete();
                             }
                         });
@@ -242,6 +242,11 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
                 }
             }
         });
+    }
+
+    private int convertIdToIndex(String projectId) {
+        int index = new ArrayList<String>(projects.keySet()).indexOf(projectId);
+        return index;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -254,8 +259,6 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
             super(itemView);
             this.textView_pCreator = itemView.findViewById(R.id.textView_pCreator);
             this.textView_pTitle = itemView.findViewById(R.id.textView_pTitle);
-            this.viewProgressBarBackground = itemView.findViewById(R.id.viewProgressBarBackground);
-            this.progressBar = itemView.findViewById(R.id.progressBar);
             materialCardViewProject = itemView.findViewById(R.id.materialCardView_Project);
             itemView.setOnClickListener(this);
         }

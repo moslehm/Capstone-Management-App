@@ -10,7 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -53,6 +55,8 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     private OnListListener onListListener;
     private String screenType;
     private boolean isSupervisor;
+    private ProgressBar progressBar;
+    private TextView textViewEmpty;
 
     public ListFragment() {
     }
@@ -78,7 +82,13 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     public void setUp() {
         screenType = getArguments().getString("screenType");
         isSupervisor = getArguments().getBoolean("isSupervisor");
+        String emptyListText = getArguments().getString("emptyListText");
 
+        textViewEmpty = (TextView) getView().findViewById(R.id.textViewEmpty);
+        textViewEmpty.setText(emptyListText);
+
+        progressBar = getView().findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
         db = FirebaseFirestore.getInstance();
 
@@ -86,31 +96,27 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
             @Override
             public void onUpdateComplete(ArrayList<String> projectIds) {
                 if (projectIds.size() != 0) {
-                    createAdapter(projectIds);
+                    textViewEmpty.setVisibility(View.GONE);
+                    createAdapter(projectIds); // Hides progress bar when its done setting up
+                } else {
+                    textViewEmpty.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
 
-        SwipeRefreshLayout swipeRefreshSingleProject = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshSingleProject.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 // Request update for projectIds
                 onListListener.onListUpdate(screenType, new OnUpdateListener() {
                     @Override
                     public void onUpdateComplete(ArrayList<String> projectIds) {
-                        if (recyclerAdapter == null) {
-                            if (projectIds.size() != 0) {
-                                createAdapter(projectIds);
-                            }
-                            return;
-                        }
-                        // projectIds update is complete
-                        recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
+                        refresh(projectIds, new EventCompleteListener() {
                             @Override
                             public void onComplete() {
-                                // Completed updating Project objects in the adapter
-                                swipeRefreshSingleProject.setRefreshing(false);
+                                swipeRefreshLayout.setRefreshing(false);
                             }
                         });
                     }
@@ -136,8 +142,37 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
                         startActivity(intent);
                     }
                 });
+                progressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    public void refresh(ArrayList<String> projectIds, EventCompleteListener eventCompleteListener) {
+        this.projectIds = projectIds;
+        if (recyclerAdapter == null) {
+            if (projectIds.size() != 0) {
+                textViewEmpty.setVisibility(View.GONE);
+                createAdapter(projectIds);
+            } else {
+                textViewEmpty.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+            }
+            eventCompleteListener.onComplete();
+            return;
+        }
+        // projectIds update is complete
+
+        recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
+            @Override
+            public void onComplete() {
+                progressBar.setVisibility(View.GONE);
+                textViewEmpty.setVisibility(View.GONE);
+                eventCompleteListener.onComplete();
+            }
+        });
+        if (projectIds.size() == 0) {
+            textViewEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -196,23 +231,33 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         if (settingUp) {
             setUp();
         } else {
-            OnUpdateListener onUpdateListener = new OnUpdateListener() {
+//            OnUpdateListener onUpdateListener = ;
+//                    if (recyclerAdapter == null) {
+//                        if (projectIds.size() != 0) {
+//                            textViewEmpty.setVisibility(View.GONE);
+//                            createAdapter(projectIds);
+//                        } else {
+//                            textViewEmpty.setVisibility(View.VISIBLE);
+//                            progressBar.setVisibility(View.GONE);
+//                        }
+//                        return;
+//                    }
+//                    recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
+//                        @Override
+//                        public void onComplete() {
+//                        }
+//                    });
+
+            onListListener.onListUpdate(screenType, new OnUpdateListener() {
                 @Override
                 public void onUpdateComplete(ArrayList<String> projectIds) {
-                    if (recyclerAdapter == null) {
-                        if (projectIds.size() != 0) {
-                            createAdapter(projectIds);
-                        }
-                        return;
-                    }
-                    recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
+                    refresh(projectIds, new EventCompleteListener() {
                         @Override
                         public void onComplete() {
                         }
                     });
                 }
-            };
-            onListListener.onListUpdate(screenType, onUpdateListener);
+            });
         }
     }
 

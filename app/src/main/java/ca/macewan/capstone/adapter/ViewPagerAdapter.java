@@ -38,15 +38,16 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
         bundle.putString("email", email);
         bundle.putBoolean("isSupervisor", true);
         if (position == 1) {
+            bundle.putString("emptyListText", "No invites received");
             bundle.putString("screenType", "invited");
             listFragment.setArguments(bundle);
             return listFragment;
         }
+        bundle.putString("emptyListText", "There are no existing projects.\nCreate one with the plus sign above");
         bundle.putString("screenType", "all");
         listFragment.setArguments(bundle);
         return listFragment;
     }
-
 
 
     @Override
@@ -75,21 +76,21 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
                     });
         } else if (Objects.equals(fragmentName, "invited")) {
             db.collection("Users")
-                .document(email)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            ArrayList<String> projectIds = (ArrayList<String>) task.getResult().get("invited");
-                            if (projectIds == null) {
-                                onUpdateListener.onUpdateComplete(new ArrayList<String>());
-                            } else {
-                                onUpdateListener.onUpdateComplete(projectIds);
+                    .document(email)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                ArrayList<String> projectIds = (ArrayList<String>) task.getResult().get("invited");
+                                if (projectIds == null) {
+                                    onUpdateListener.onUpdateComplete(new ArrayList<String>());
+                                } else {
+                                    onUpdateListener.onUpdateComplete(projectIds);
+                                }
                             }
                         }
-                    }
-                });
+                    });
         }
     }
 }

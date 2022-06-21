@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
             bundle.putString("email", user.email);
             bundle.putString("screenType", "list");
             bundle.putBoolean("isSupervisor", false);
+            bundle.putString("emptyListText", "There are no existing projects.\nCreate one with the plus sign above");
             listFragment = new ListFragment();
             listFragment.setArguments(bundle);
             ((ListFragment) listFragment).setListener(this);

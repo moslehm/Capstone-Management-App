@@ -13,47 +13,41 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import ca.macewan.capstone.adapter.HomeRecyclerAdapter;
 import ca.macewan.capstone.adapter.SharedMethods;
 
 public class HomeFragment extends Fragment implements ListFragment.OnListListener {
     private static final String TAG = "HomeFragment";
-    private static final int HAS_NONE = 0;
+    private static final int OTHER = 0;
     private static final int HAS_ONE = 1;
-    private static final int HAS_MORE_THAN_ONE = 2;
 
-    private TextView textViewDefault;
+//    private TextView textViewDefault;
     private View singleProjectView;
     private String email;
     private ListFragment listFragment;
     private FirebaseFirestore db;
     private View view;
     private int prevSize;
-    private SwipeRefreshLayout swipeRefreshRecycler;
+//    private SwipeRefreshLayout swipeRefreshRecycler;
     private SwipeRefreshLayout swipeRefreshSingleProject;
     private ArrayList<String> projectIds;
     private int currentState;
     private boolean isVisible;
     private boolean isOwnerOfSingleProject;
+    private View progressBar;
+    private View viewProgressBarBackground;
 
     public HomeFragment() {
     }
@@ -70,19 +64,21 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
         view = inflater.inflate(R.layout.fragment_home, container, false);
         db = FirebaseFirestore.getInstance();
 
-        textViewDefault = (TextView) view.findViewById(R.id.textViewDefault);
+//        textViewDefault = (TextView) view.findViewById(R.id.textViewDefault);
+        progressBar = view.findViewById(R.id.progressBar);
+        viewProgressBarBackground = view.findViewById(R.id.viewProgressBarBackground);
         singleProjectView = view.findViewById(R.id.singleProject);
         prevSize = -1;
         email = getArguments().getString("email");
 
-        swipeRefreshRecycler = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshRecycler);
-        swipeRefreshRecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refresh();
-                swipeRefreshRecycler.setRefreshing(false);
-            }
-        });
+//        swipeRefreshRecycler = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshRecycler);
+//        swipeRefreshRecycler.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                refresh();
+//                swipeRefreshRecycler.setRefreshing(false);
+//            }
+//        });
         swipeRefreshSingleProject = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshSingleProject);
         swipeRefreshSingleProject.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -96,6 +92,7 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
         bundle.putString("email", email);
         bundle.putString("screenType", "homeList");
         bundle.putBoolean("isSupervisor", false);
+        bundle.putString("emptyListText", "You have no projects\nCreate or join one in the list tab");
         listFragment = new ListFragment();
         listFragment.setArguments(bundle);
         listFragment.setListener(this);
@@ -105,97 +102,128 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
     }
 
     private void refresh() {
+        progressBar.setVisibility(View.VISIBLE);
+        viewProgressBarBackground.setVisibility(View.VISIBLE);
         db.collection("Users")
-                .document(email)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot snapshot = task.getResult();
-                        Log.d(TAG, "User fields modified: " + snapshot.getData());
-                        projectIds = (ArrayList<String>) task.getResult().get("projects");
-                        updateView();
+            .document(email)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot snapshot = task.getResult();
+                    Log.d(TAG, "User updated: " + snapshot.getData());
+                    projectIds = (ArrayList<String>) task.getResult().get("projects");
+                    if (projectIds == null) {
+                        projectIds = new ArrayList<String>();
                     }
-                });
+                    updateView();
+                }
+            });
     }
 
     private void updateView() {
-        if (projectIds == null) {
-            currentState = HAS_NONE;
-            // User has no projects, make sure default TextView visible
-            textViewDefault.setVisibility(View.VISIBLE);
-            SharedMethods.hideFragment(getChildFragmentManager(), listFragment);
-            singleProjectView.setVisibility(View.GONE);
-            requireActivity().invalidateOptionsMenu();
-            return;
-        }
+//        if (projectIds == null) {
+//            currentState = HAS_NONE;
+//            // User has no projects, make sure default TextView visible
+////            textViewDefault.setVisibility(View.VISIBLE);
+//            SharedMethods.hideFragment(getChildFragmentManager(), listFragment);
+//            singleProjectView.setVisibility(View.GONE);
+//            requireActivity().invalidateOptionsMenu();
+//            return;
+//        }
+
         int size = projectIds.size();
-        if (prevSize != 0 && size == 0) {
-            currentState = HAS_NONE;
-            // User has no projects, make sure default TextView visible
-            textViewDefault.setVisibility(View.VISIBLE);
-            SharedMethods.hideFragment(getChildFragmentManager(), listFragment);
-            singleProjectView.setVisibility(View.GONE);
-            requireActivity().invalidateOptionsMenu();
-        }
-        else if (size == 1) {
+//        if (prevSize != 0 && size == 0) {
+//            currentState = HAS_NONE;
+//            // User has no projects, make sure default TextView visible
+////            textViewDefault.setVisibility(View.VISIBLE);
+//            SharedMethods.hideFragment(getChildFragmentManager(), listFragment);
+//            singleProjectView.setVisibility(View.GONE);
+//            requireActivity().invalidateOptionsMenu();
+//        }
+
+        if (size == 1) {
             currentState = HAS_ONE;
             DocumentReference projectRef = FirebaseFirestore.getInstance().collection("Projects").document(projectIds.get(0));
             // User only has one project, no need for a list view
             if (prevSize != 1) {
-                singleProjectView.setVisibility(View.VISIBLE);
-                textViewDefault.setVisibility(View.GONE);
                 SharedMethods.hideFragment(getChildFragmentManager(), listFragment);
-                swipeRefreshSingleProject.setEnabled(true);
-                swipeRefreshSingleProject.setVisibility(View.VISIBLE);
-                swipeRefreshRecycler.setEnabled(false);
-                swipeRefreshRecycler.setVisibility(View.GONE);
-                requireActivity().invalidateOptionsMenu();
-            }
-            projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentReference creatorRef = task.getResult().getDocumentReference("creator");
-                        creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    String creatorEmail = task.getResult().getString("email");
-                                    if (Objects.equals(creatorEmail, email))
-                                        isOwnerOfSingleProject = true;
-                                    else {
-                                        isOwnerOfSingleProject = false;
-                                    }
-                                }
-                            }
-                        });
+                refreshSingleProject(projectRef, new EventCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        singleProjectView.setVisibility(View.VISIBLE);
+//                textViewDefault.setVisibility(View.GONE);
+                        swipeRefreshSingleProject.setEnabled(true);
+                        swipeRefreshSingleProject.setVisibility(View.VISIBLE);
+                        SharedMethods.setupProjectView(singleProjectView, projectRef, email, getActivity());
+//                swipeRefreshRecycler.setEnabled(false);
+//                swipeRefreshRecycler.setVisibility(View.GONE);
+                        requireActivity().invalidateOptionsMenu();
+                        progressBar.setVisibility(View.GONE);
+                        viewProgressBarBackground.setVisibility(View.GONE);
                     }
-                }
-            });
-            SharedMethods.setupProjectView(singleProjectView, projectRef, email, getActivity());
-        }
-        else if (size > 1) {
-            currentState = HAS_MORE_THAN_ONE;
-            if (prevSize < 2) {
+                });
+            } else {
+                refreshSingleProject(projectRef, new EventCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        SharedMethods.setupProjectView(singleProjectView, projectRef, email, getActivity());
+                        progressBar.setVisibility(View.GONE);
+                        viewProgressBarBackground.setVisibility(View.GONE);
+                    }
+                });
+            }
+        } else {
+            progressBar.setVisibility(View.GONE);
+            viewProgressBarBackground.setVisibility(View.GONE);
+            currentState = OTHER;
+            if (prevSize - size != 0) {
                 SharedMethods.showFragment(getChildFragmentManager(), listFragment);
-                textViewDefault.setVisibility(View.GONE);
+//                textViewDefault.setVisibility(View.GONE);
                 singleProjectView.setVisibility(View.GONE);
-                swipeRefreshRecycler.setEnabled(true);
-                swipeRefreshRecycler.setVisibility(View.VISIBLE);
+//                swipeRefreshRecycler.setEnabled(true);
+//                swipeRefreshRecycler.setVisibility(View.VISIBLE);
                 swipeRefreshSingleProject.setEnabled(false);
                 swipeRefreshSingleProject.setVisibility(View.GONE);
                 requireActivity().invalidateOptionsMenu();
             }
+            if (prevSize != -1) {
+                listFragment.refresh(projectIds, new EventCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+            }
         }
         prevSize = size;
+    }
+
+    private void refreshSingleProject(DocumentReference projectRef, EventCompleteListener eventCompleteListener) {
+        projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentReference creatorRef = task.getResult().getDocumentReference("creator");
+                    creatorRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                String creatorEmail = task.getResult().getString("email");
+                                isOwnerOfSingleProject = Objects.equals(creatorEmail, email);
+                                eventCompleteListener.onComplete();
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //inflate menu
         inflater.inflate(R.menu.menu_information_proposal, menu);
-        if (currentState == HAS_NONE || currentState == HAS_MORE_THAN_ONE) {
+        if (currentState == OTHER) {
             menu.findItem(R.id.action_edit).setVisible(false);
             menu.findItem(R.id.action_quit).setVisible(false);
             menu.findItem(R.id.action_delete).setVisible(false);
@@ -268,10 +296,9 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
                     if (task.isSuccessful()) {
                         projectIds = (ArrayList<String>) task.getResult().get("projects");
                         if (projectIds == null) {
-                            onUpdateListener.onUpdateComplete(new ArrayList<String>());
-                        } else {
-                            onUpdateListener.onUpdateComplete(projectIds);
+                            projectIds = new ArrayList<String>();
                         }
+                        onUpdateListener.onUpdateComplete(projectIds);
                     }
                 }
             });
