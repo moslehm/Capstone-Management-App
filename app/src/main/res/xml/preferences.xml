@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Notifications">
+
+    </PreferenceCategory>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="notifsEnabled"
+        android:title="Enable Notifications" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="projectChange"
+        android:title="Project receives changes"
+        app:dependency="notifsEnabled"
+        app:summary="Notify when changes to joined project is made" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="projectJoin"
+        android:summary="Notify when someone requests to join project"
+        android:dependency="notifsEnabled"
+        android:title="On project join" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="supervisorJoin"
+        android:summary="Notify when a supervisor agrees to supervise the project"
+        android:dependency="notifsEnabled"
+        android:title="On supervisor accept" />
+    <PreferenceCategory android:title="Display">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="darkMode"
+            android:title="Dark Mode" />
+    </PreferenceCategory>
+</PreferenceScreen>

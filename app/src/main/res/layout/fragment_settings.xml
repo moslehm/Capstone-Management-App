@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsFragment">
+
+    <TextView
+        android:id="@+id/settingsProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center|start"
+        android:text="@string/profile"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_baseline_person_24"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsText" />
+
+    <TextView
+        android:id="@+id/settingsPreferences"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_below="@+id/settingsProfile"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/preferences"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_settings"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsProfile" />
+
+    <TextView
+        android:id="@+id/settingsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/settings"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/settingsProjects"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="View Completed Projects"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_archive"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsPreferences" />
+
+    <TextView
+        android:id="@+id/settingsHelp"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/help_and_support"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_baseline_help_outline_24"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsProjects" />
+
+    <TextView
+        android:id="@+id/settingsSignOut"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/sign_out"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_baseline_login_24"
+        app:drawableTint="@color/design_default_color_error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsAbout"
+        tools:text="Sign Out" />
+
+    <TextView
+        android:id="@+id/settingsAbout"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="@string/about"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_outline_info_24"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsHelp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
