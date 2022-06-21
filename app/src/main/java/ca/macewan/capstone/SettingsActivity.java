@@ -3,10 +3,21 @@ package ca.macewan.capstone;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.widget.CheckBox;
+
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -40,12 +51,58 @@ public class SettingsActivity extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.idFrameLayout, new PreferencesFragment())
                     .commit();
+
+            System.out.print("Inflated fragment.");
         }
     }
+
     public static class PreferencesFragment extends PreferenceFragmentCompat {
+        CheckBoxPreference notifsEnabled, notifsChange, notifsJoin, notifsSupervisorAccept;
+        SwitchPreference darkMode;
+        SharedPreferences prefs;
+
+        Preference.OnPreferenceChangeListener notifListener = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                System.out.print("Listening to preference change");
+                System.out.print(newValue);
+                if (newValue == Boolean.FALSE) {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(preference.getKey());
+                } else {
+                    FirebaseMessaging.getInstance().subscribeToTopic(preference.getKey());
+                }
+                return true;
+            }
+        };
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preferences, rootKey);
+            notifsEnabled = findPreference("notifsEnabled");
+            notifsChange = findPreference("projectChange");
+            notifsJoin = findPreference("projectJoin");
+            notifsSupervisorAccept = findPreference("supervisorJoin");
+            darkMode = findPreference("darkMode");
+            prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+            notifsEnabled.setOnPreferenceChangeListener(notifListener);
+            notifsChange.setOnPreferenceChangeListener(notifListener);
+            notifsJoin.setOnPreferenceChangeListener(notifListener);
+            notifsSupervisorAccept.setOnPreferenceChangeListener(notifListener);
+            darkMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Resources.Theme theme = getContext().getTheme();
+                    if (newValue == Boolean.TRUE) {
+                        theme.applyStyle(R.style.Theme_Capstone_Night, true);
+                    } else {
+                        theme.applyStyle(R.style.Theme_Capstone, true);
+                    }
+                    return true;
+                }
+            });
+
+            System.out.print(prefs.toString());
         }
     }
 }

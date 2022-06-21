@@ -51,5 +51,8 @@
     <string name="spring">Spring</string>
     <string name="winter">Winter</string>
     <string name="summer">Summer</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="new_password">New Password</string>
+    <string name="old_password">Old Password</string>
 
 </resources>

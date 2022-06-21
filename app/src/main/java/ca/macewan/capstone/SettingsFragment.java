@@ -3,15 +3,28 @@ package ca.macewan.capstone;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -114,8 +127,19 @@ public class SettingsFragment extends Fragment {
         textAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Clicked About!",
-                        Toast.LENGTH_SHORT);
+                Toast.makeText(getActivity(), "Surprise, we're sending a notification!",
+                        Toast.LENGTH_SHORT).show();
+                FirebaseMessaging.getInstance().getToken()
+                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
+                                if (!task.isSuccessful()) {
+                                    return;
+                                }
+                                String token = task.getResult();
+                                tokenThread(token);
+                            }
+                        });
             }
         });
 
@@ -129,5 +153,33 @@ public class SettingsFragment extends Fragment {
                 startActivity(new Intent(getActivity(), Login.class));
             }
         });
+    }
+
+    private void tokenThread(final String token) {
+        Thread t = new Thread(() -> {
+            try {
+                sendToken(token);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+    }
+
+    private void sendToken(String token) throws IOException, JSONException {
+        Socket socket = null;
+        OutputStreamWriter output = null;
+        socket = new Socket("34.168.78.99", 10000);
+        System.out.println("Connected");
+        output = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+        JSONObject json = new JSONObject();
+        json.put("token", token);
+        json.put("topicA", "notifsEnabled");
+        json.put("topicB", "projectJoin");
+        output.write(json.toString());
+        output.close();
+        socket.close();
     }
 }

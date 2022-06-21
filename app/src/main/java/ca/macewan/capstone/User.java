@@ -12,6 +12,7 @@ public class User {
     public String role;
     public String phone;
     public List<String> projects;
+    public String picture;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
