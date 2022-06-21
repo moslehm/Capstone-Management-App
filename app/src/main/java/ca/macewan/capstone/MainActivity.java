@@ -98,11 +98,8 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
     private void setupAllFragments() {
         Bundle bundle = new Bundle();
         bundle.putString("email", user.email);
-//        bundle.putString("screenType", "home");
-//        bundle.putBoolean("isSupervisor", false);
         homeFragment = new HomeFragment();
         homeFragment.setArguments(bundle);
-//        ((ListFragment) homeFragment).setListener(this);
 
         if (Objects.equals(user.role, "student")) {
             bundle = new Bundle();
@@ -121,47 +118,28 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnLi
         settingsFragment = new SettingsFragment();
         selected = homeFragment;
 
-        SharedMethods.createFragment(getSupportFragmentManager(), homeFragment, "home");
-        SharedMethods.createFragment(getSupportFragmentManager(), listFragment, "list");
-        SharedMethods.createFragment(getSupportFragmentManager(), settingsFragment, "settings");
+        SharedMethods.createFragment(getSupportFragmentManager(), R.id.fl_wrapper, homeFragment, "home");
+        SharedMethods.createFragment(getSupportFragmentManager(), R.id.fl_wrapper, listFragment, "list");
+        SharedMethods.createFragment(getSupportFragmentManager(), R.id.fl_wrapper, settingsFragment, "settings");
         SharedMethods.showFragment(getSupportFragmentManager(), selected);
     }
 
     @Override
     public void onListUpdate(String fragmentName, ListFragment.OnUpdateListener onUpdateListener) {
         ArrayList<String> projectIds = new ArrayList<String>();
-        if (Objects.equals(fragmentName, "list")) {
-            db.collection("Projects")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                projectIds.add(document.getId());
-                            }
-                            onUpdateListener.onUpdateComplete(projectIds);
+        db.collection("Projects")
+            .whereEqualTo("isComplete", false)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            projectIds.add(document.getId());
                         }
+                        onUpdateListener.onUpdateComplete(projectIds);
                     }
-                });
-        }
-//        else if (Objects.equals(fragmentName, "home")) {
-//            db.collection("Users")
-//                    .document(user.email)
-//                    .get()
-//                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                ArrayList<String> projectIds = (ArrayList<String>) task.getResult().get("projects");
-//                                if (projectIds == null) {
-//                                    onUpdateListener.onUpdateComplete(new ArrayList<String>());
-//                                } else {
-//                                    onUpdateListener.onUpdateComplete(projectIds);
-//                                }
-//                            }
-//                        }
-//                    });
-//        }
+                }
+            });
     }
 }

@@ -52,11 +52,14 @@ public class HomeRecyclerAdapter extends RecyclerView.Adapter<HomeRecyclerAdapte
                     if (tagsList != null) {
                         holder.textView_pTags.setText(android.text.TextUtils.join(", ", tagsList));
                     }
-
-                    if (!snapshot.getBoolean("status"))
-                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
-                    else
-                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
+//<<<<<<< HEAD
+//
+//                    if (!snapshot.getBoolean("status"))
+//                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
+//                    else
+//                        holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
+//=======
+//>>>>>>> merge
                 }
                 holder.viewProgressBarBackground.setVisibility(View.GONE);
                 holder.progressBar.setVisibility(View.GONE);

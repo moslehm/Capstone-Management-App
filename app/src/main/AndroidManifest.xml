@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Capstone">
         <activity
+            android:name=".CompletedProjectsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChangePasswordActivity"
             android:exported="false" />
         <activity
@@ -35,15 +38,6 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ProjectInfoActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ProjectInfoActivityProf"
-            android:exported="true" />
-        <activity
-            android:name=".ProfMain"
             android:exported="true" />
         <activity
             android:name=".Login"

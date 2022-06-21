@@ -24,8 +24,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
     private final String email;
 
 
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, String email) {
-        super(fragmentActivity);
+    public ViewPagerAdapter(@NonNull Fragment fragment, String email) {
+        super(fragment);
         this.email = email;
     }
 
@@ -47,6 +47,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
         return listFragment;
     }
 
+
+
     @Override
     public int getItemCount() {
         return 2;
@@ -58,6 +60,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter implements ListFragme
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         if (Objects.equals(fragmentName, "all")) {
             db.collection("Projects")
+                    .whereEqualTo("isComplete", false)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override

@@ -54,6 +54,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/settingsProjects"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:text="View Completed Projects"
+        android:textSize="20sp"
+        app:drawableEndCompat="@drawable/ic_baseline_arrow_forward_ios_24"
+        app:drawableStartCompat="@drawable/ic_archive"
+        app:drawableTint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingsPreferences" />
+
+    <TextView
         android:id="@+id/settingsHelp"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
@@ -67,7 +83,7 @@
         app:drawableTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settingsPreferences" />
+        app:layout_constraintTop_toBottomOf="@+id/settingsProjects" />
 
     <TextView
         android:id="@+id/settingsSignOut"

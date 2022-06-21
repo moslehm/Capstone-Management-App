@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +23,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -44,6 +47,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
     private View projectView;
     private View profButtonsLayout;
     private boolean isSupervisor;
+    private View markAsCompleteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +75,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
                 swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        update();
+                        updateProject();
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -84,6 +88,54 @@ public class ProjectInformationActivity extends AppCompatActivity {
         userRef = db.collection("Users").document(email);
         projectView = findViewById(R.id.projectLayout);
         profButtonsLayout = findViewById(R.id.profButtonsLayout);
+        markAsCompleteButton = projectView.findViewById(R.id.markAsCompleteButton);
+        markAsCompleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MaterialAlertDialogBuilder(ProjectInformationActivity.this)
+                    .setMessage("Mark project as complete?")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Move project id to from projects to completed
+                            userRef.update("completed", FieldValue.arrayUnion(projectRef.getId()));
+                            userRef.update("projects", FieldValue.arrayRemove(projectRef.getId()));
+                            // Add project to the "Complete" collection and remove it from Projects
+                            projectRef.update("isComplete", true);
+                            // Remove supervisor and members in project
+                            db.collection("Users").whereArrayContains("projects", projectID)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            for (QueryDocumentSnapshot supervisor : task.getResult()) {
+                                                supervisor.getReference().update("projects", FieldValue.arrayRemove(projectRef.getId()));
+                                                supervisor.getReference().update("completed", FieldValue.arrayUnion(projectRef.getId()));
+                                            }
+                                        }
+                                    });
+                            // Remove invites from professors
+                            db.collection("Users").whereArrayContains("invited", projectID)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            for (QueryDocumentSnapshot supervisor : task.getResult()) {
+                                                supervisor.getReference().update("invited", FieldValue.arrayRemove(projectRef.getId()));
+                                            }
+                                        }
+                                    });
+                            finish();
+                        }
+                    })
+                    .show();
+            }
+        });
 
         project = getIntent().getExtras().getParcelable("project");
         if (project != null && !isSupervisor) {
@@ -107,7 +159,6 @@ public class ProjectInformationActivity extends AppCompatActivity {
                 }
             });
         }
-//        SharedMethods.setupProjectView(projectView, projectRef, email, this);
     }
 
     private void profButtonsSetUp() {
@@ -131,7 +182,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
                                 userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 projectRef.update("supervisorsPending", userRef);
                                 profButtonsLayout.setVisibility(View.GONE);
-                                updateOptionsMenu();
+                                updateUser();
                             }
                         })
                         .show();
@@ -160,7 +211,8 @@ public class ProjectInformationActivity extends AppCompatActivity {
                                 // remove request from invited array
                                 userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 profButtonsLayout.setVisibility(View.GONE);
-                                updateOptionsMenu();
+                                updateProject();
+                                updateUser();
                             }
                         })
                         .show();
@@ -183,7 +235,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
         });
     }
 
-    private void update() {
+    private void updateProject() {
         projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -210,7 +262,6 @@ public class ProjectInformationActivity extends AppCompatActivity {
         MaterialTextView textViewTags = (MaterialTextView) projectView.findViewById(R.id.textViewTags);
         View textViewImages = projectView.findViewById(R.id.textViewImages);
         LinearLayout linearLayoutImages = (LinearLayout) projectView.findViewById(R.id.linearLayoutImages);
-        CheckBox checkBoxStatus = (CheckBox) projectView.findViewById(R.id.checkBox_StatusProf);
 
         textViewTitle.setContentText(project.getName(), null);
         textViewCreator.setContentText(project.getCreatorString(), null);
@@ -245,7 +296,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
 
         if (SharedMethods.listIsEmpty(supervisorsStringList)) {
             // No supervisors, check if any are pending
-            if (SharedMethods.listIsEmpty(supervisorsPendingStringList)) {
+            if (SharedMethods.listIsEmpty(supervisorsPendingStringList) || project.getIsComplete()) {
                 textViewSupervisors.setContentText("None", null);
                 return;
             }
@@ -291,11 +342,11 @@ public class ProjectInformationActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_information_proposal, menu);
         this.menu = menu;
-        updateOptionsMenu();
+        updateUser();
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void updateOptionsMenu() {
+    private void updateUser() {
         db.collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getEmail())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -315,44 +366,48 @@ public class ProjectInformationActivity extends AppCompatActivity {
         menu.findItem(R.id.action_quit).setVisible(false);
         menu.findItem(R.id.action_join).setVisible(false);
 
-        boolean userJoined = false;
-        if (user.projects != null) {
-            for (String projectId : user.projects) {
-                if (projectId.equals(projectRef.getId())) {
-                    userJoined = true;
-                    break;
+        if (!project.getIsComplete()) {
+            boolean userJoined = false;
+            if (user.projects != null) {
+                for (String projectId : user.projects) {
+                    if (projectId.equals(projectRef.getId())) {
+                        userJoined = true;
+                        break;
+                    }
+                }
+                if (!userJoined) {
+                    if (!isSupervisor)
+                        menu.findItem(R.id.action_join).setVisible(true);
+                    return;
                 }
             }
-            if (!userJoined) {
-                if (!isSupervisor)
-                    menu.findItem(R.id.action_join).setVisible(true);
-                return;
-            }
-        }
 
-        projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    task.getResult()
-                            .getDocumentReference("creator")
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        String creatorEmail = task.getResult().getString("email");
-                                        if (Objects.equals(creatorEmail, email))
-                                            menu.findItem(R.id.action_delete).setVisible(true);
-                                        else
-                                            menu.findItem(R.id.action_quit).setVisible(true);
-                                        menu.findItem(R.id.action_edit).setVisible(true);
+            projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        task.getResult()
+                                .getDocumentReference("creator")
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            String creatorEmail = task.getResult().getString("email");
+                                            if (Objects.equals(creatorEmail, email)) {
+                                                menu.findItem(R.id.action_delete).setVisible(true);
+                                                markAsCompleteButton.setVisibility(View.VISIBLE);
+                                            } else {
+                                                menu.findItem(R.id.action_quit).setVisible(true);
+                                            }
+                                            menu.findItem(R.id.action_edit).setVisible(true);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -367,7 +422,10 @@ public class ProjectInformationActivity extends AppCompatActivity {
             SharedMethods.quitProject(userRef, projectRef, ProjectInformationActivity.this, new EventCompleteListener() {
                 @Override
                 public void onComplete() {
-                    updateOptionsMenu();
+                    // Update user to change options menu buttons if needed
+                    updateUser();
+                    // Update project to show any changes made
+                    updateProject();
                 }
             });
         } else if (id == R.id.action_delete) {
@@ -381,7 +439,10 @@ public class ProjectInformationActivity extends AppCompatActivity {
             SharedMethods.joinProject(userRef, projectRef, ProjectInformationActivity.this, new EventCompleteListener() {
                 @Override
                 public void onComplete() {
-                    updateOptionsMenu();
+                    // Update user to change options menu buttons if needed
+                    updateUser();
+                    // Update project to show any changes made
+                    updateProject();
                 }
             });
         }
@@ -394,13 +455,4 @@ public class ProjectInformationActivity extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        if (swipeRefreshLayout!=null) {
-//            swipeRefreshLayout.setRefreshing(false);
-//            swipeRefreshLayout.destroyDrawingCache();
-//            swipeRefreshLayout.clearAnimation();
-//        }
-//    }
 }

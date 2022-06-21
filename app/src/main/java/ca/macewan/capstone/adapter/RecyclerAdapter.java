@@ -45,12 +45,15 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
             }
         });
         holder.textViewProjectName.setText(model.getName());
-        String term = model.getSemester() + " " + model.getYear();
-        holder.textView_pTerm.setText(term);
-
-        for (String tag : model.getTags())
-            holder.textView_Tags.append(tag + " ");
-
+//<<<<<<< HEAD
+//        String term = model.getSemester() + " " + model.getYear();
+//        holder.textView_pTerm.setText(term);
+//
+//        for (String tag : model.getTags())
+//            holder.textView_Tags.append(tag + " ");
+//
+//=======
+//>>>>>>> merge
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);
     }
@@ -67,10 +70,13 @@ public class RecyclerAdapter extends FirestoreRecyclerAdapter<Project, RecyclerA
     }
 
     public class ProjectViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+//<<<<<<< HEAD
         TextView textViewProjectName, textView_pTerm, textView_Tags;
 //        TextView textViewProjectDesc;
+//=======
+//        TextView textViewProjectName;
+//>>>>>>> merge
         TextView textViewProjectCreator;
-//        TextView textViewProjectMembers;
         View viewProgressBarBackground;
         ProgressBar progressBar;
         ImageView imageView_status;

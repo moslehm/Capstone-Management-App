@@ -44,7 +44,7 @@ public class ProfListFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tl_main);
         ViewPager2 viewPager2 = view.findViewById(R.id.vp2_main);
 
-        adapter = new ViewPagerAdapter(requireActivity(), email);
+        adapter = new ViewPagerAdapter(this, email);
         viewPager2.setAdapter(adapter);
 
 
@@ -64,46 +64,4 @@ public class ProfListFragment extends Fragment {
 
         return view;
     }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        //inflate menu
-//        inflater.inflate(R.menu.menu_options, menu);
-//        MenuItem item = menu.findItem(R.id.app_bar_search);
-//        searchView = (SearchView) item.getActionView();
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                adapter.search(query);
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                adapter.search(newText);
-//                return false;
-//            }
-//        });
-//        System.out.println("onCreateOptionsMenu");
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == R.id.action_add) {
-//            Intent menuIntent = new Intent(getActivity(), ProposalCreationActivity.class);
-//            startActivity(menuIntent);
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
-//    @Override
-//    public void onHiddenChanged(boolean hidden) {
-//        super.onHiddenChanged(hidden);
-//        System.out.println("onHiddenChanged");
-//        if (searchView != null) {
-//            System.out.println("searchView");
-//        }
-//    }
 }

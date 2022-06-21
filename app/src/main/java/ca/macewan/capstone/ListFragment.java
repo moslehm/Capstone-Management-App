@@ -82,7 +82,6 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
 
         recyclerViewProject = (RecyclerView) getView().findViewById(R.id.recyclerView_Project);
         db = FirebaseFirestore.getInstance();
-//        projectIds = new ArrayList<String>();
 
         onListListener.onListUpdate(screenType, new OnUpdateListener() {
             @Override
@@ -123,7 +122,7 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     }
 
     private void createAdapter(ArrayList<String> projectIds) {
-        recyclerAdapter = new RecyclerAdapterV2(projectIds, new EventCompleteListener() {
+        recyclerAdapter = new RecyclerAdapterV2(projectIds, screenType, new EventCompleteListener() {
             @Override
             public void onComplete() {
                 recyclerViewProject.setAdapter(recyclerAdapter);
@@ -147,23 +146,6 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         });
     }
 
-//    void update(EventCompleteListener eventCompleteListener) {
-//        projectIds.clear();
-//        db.collection("Projects")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                projectIds.add(document.getId());
-//                            }
-//                            eventCompleteListener.onComplete();
-//                        }
-//                    }
-//                });
-//    }
-
     @Override
     public void onProjectClick(int position, String projectID, Project project) {
         Intent intent = new Intent(getContext(), ProjectInformationActivity.class);
@@ -175,31 +157,33 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflate menu
-        inflater.inflate(R.menu.menu_options, menu);
-        MenuItem item = menu.findItem(R.id.app_bar_search);
-        if (Objects.equals(screenType, "homeList")) {
-            menu.findItem(R.id.action_add).setVisible(false);
-        }
-        searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (recyclerAdapter != null) {
-                    recyclerAdapter.search(query);
-                }
-                return false;
+        if (screenType != null) {
+            //inflate menu
+            inflater.inflate(R.menu.menu_options, menu);
+            MenuItem item = menu.findItem(R.id.app_bar_search);
+            if (Objects.equals(screenType, "homeList") || Objects.equals(screenType, "completedList")) {
+                menu.findItem(R.id.action_add).setVisible(false);
             }
+            searchView = (SearchView) item.getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    if (recyclerAdapter != null) {
+                        recyclerAdapter.search(query);
+                    }
+                    return false;
+                }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (recyclerAdapter != null) {
-                    recyclerAdapter.search(newText);
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (recyclerAdapter != null) {
+                        recyclerAdapter.search(newText);
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
-        super.onCreateOptionsMenu(menu, inflater);
+            });
+            super.onCreateOptionsMenu(menu, inflater);
+        }
     }
 
     @Override
@@ -242,6 +226,7 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (recyclerAdapter != null && hidden) {
+            // TODO: make search lose focus and maybe clear it?
             recyclerAdapter.search("");
         }
     }

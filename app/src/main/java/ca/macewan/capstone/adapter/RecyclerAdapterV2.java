@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import ca.macewan.capstone.EventCompleteListener;
 import ca.macewan.capstone.Project;
@@ -34,6 +35,7 @@ import ca.macewan.capstone.R;
 
 public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.ViewHolder> {
     private final FirebaseFirestore db;
+    private String screenType;
     private int addCounter;
     private int modifiedCounter;
     LinkedHashMap<String, Project> projects;
@@ -51,8 +53,9 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         projectsToDisplay = new LinkedHashMap<String, Project>();
     }
 
-    public RecyclerAdapterV2(List<String> projectIds, EventCompleteListener eventCompleteListener) {
+    public RecyclerAdapterV2(List<String> projectIds, String screenType, EventCompleteListener eventCompleteListener) {
         db = FirebaseFirestore.getInstance();
+        this.screenType = screenType;
         projects = new LinkedHashMap<String, Project>();
         projectsToDisplay = new LinkedHashMap<String, Project>();
         currentProjectIds = new ArrayList<String>();
@@ -62,7 +65,8 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     }
 
     private void addProject(String projectId, EventCompleteListener eventCompleteListener) {
-        DocumentReference projectRef = db.collection("Projects").document(projectId);
+        DocumentReference projectRef;
+        projectRef = db.collection("Projects").document(projectId);
         projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -122,13 +126,16 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         String term = project.getSemester() + " " + project.getYear();
         holder.textView_pTerm.setText(term);
 
-        if (!project.getStatus())
-            holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
-        else
-            holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
-        holder.textView_Tags.setText(null);
-        for (String tag : project.getTags())
-            holder.textView_Tags.append(tag + " ");
+//<<<<<<< HEAD
+//        if (!project.getStatus())
+//            holder.imageView_status.setImageResource(R.drawable.ic_baseline_closed_red);
+//        else
+//            holder.imageView_status.setImageResource(R.drawable.ic_baseline_open_green);
+//        holder.textView_Tags.setText(null);
+//        for (String tag : project.getTags())
+//            holder.textView_Tags.append(tag + " ");
+//=======
+//>>>>>>> merge
         holder.viewProgressBarBackground.setVisibility(View.GONE);
         holder.progressBar.setVisibility(View.GONE);
     }
@@ -279,27 +286,4 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
     public interface OnProjectListener {
         void onProjectClick(int position, String projectID, Project project);
     }
-
-//    public void updateList(LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        notifyDataSetChanged();
-//    }
-//
-//    public void updateItem(String key, LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        int index = new ArrayList<String>(projects.keySet()).indexOf(key);
-//        notifyItemChanged(index);
-//    }
-//
-//    public void addItem(String key, LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        int index = new ArrayList<String>(projects.keySet()).indexOf(key);
-//        notifyItemInserted(index);
-//    }
-//
-//    public void removeItem(String key, LinkedHashMap<String, Project> projects) {
-//        this.projects = projects;
-//        int index = new ArrayList<String>(projects.keySet()).indexOf(key);
-//        notifyItemRemoved(index);
-//    }
 }

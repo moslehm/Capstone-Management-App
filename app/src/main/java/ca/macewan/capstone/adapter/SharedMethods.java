@@ -94,7 +94,7 @@ public class SharedMethods {
         MaterialTextView textViewMembers = (MaterialTextView) projectView.findViewById(R.id.textViewMembers);
         MaterialTextView textViewDescription = (MaterialTextView) projectView.findViewById(R.id.textViewDescription);
         MaterialTextView textViewTags = (MaterialTextView) projectView.findViewById(R.id.textViewTags);
-        CheckBox checkBoxStatus = (CheckBox) projectView.findViewById(R.id.checkBox_StatusProf);
+
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -110,9 +110,6 @@ public class SharedMethods {
                                 String creatorName = task.getResult().getString("name");
                                 String creatorEmail = task.getResult().getString("email");
                                 String creatorInfo = creatorName + " <" + creatorEmail + ">";
-                                if (Objects.equals(email, creatorEmail)) {
-                                    checkBoxStatus.setEnabled(true);
-                                }
                                 textViewCreator.setContentText(creatorInfo, null);
                             }
                         }
@@ -125,25 +122,6 @@ public class SharedMethods {
                     textViewDescription.setContentText(documentSnapshot.getString("description"), null);
                     SharedMethods.displayStrings(documentSnapshot.get("tags"), textViewTags);
                     SharedMethods.displayImages(documentSnapshot.get("imagePaths"), projectView, activity);
-
-                    boolean status = documentSnapshot.getBoolean("status");
-                    if (status) {
-                        checkBoxStatus.setChecked(true);
-                    }
-                    else {
-                        checkBoxStatus.setChecked(false);
-                    }
-                    checkBoxStatus.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (checkBoxStatus.isChecked()) {
-                                documentReference.update("status", true);
-                            }
-                            else {
-                                documentReference.update("status", false);
-                            }
-                        }
-                    });
                 }
             }
         });
@@ -271,9 +249,9 @@ public class SharedMethods {
         return list == null || list.size() == 0;
     }
 
-    public static void createFragment(FragmentManager supportFragmentManager, Fragment fragment, String tag){
+    public static void createFragment(FragmentManager supportFragmentManager, int id, Fragment fragment, String tag){
         supportFragmentManager.beginTransaction()
-                .add(R.id.fl_wrapper, fragment, tag)
+                .add(id, fragment, tag)
                 .hide(fragment)
                 .commit();
     }

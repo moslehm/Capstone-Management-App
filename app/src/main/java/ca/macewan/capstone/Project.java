@@ -34,7 +34,7 @@ public class Project implements Parcelable {
     private String description;
     private List<String> tags;
     private List<String> imagePaths;
-    private boolean status;
+    private boolean isComplete;
     private int membersCounter;
     private int supervisorsCounter;
     private int supervisorsPendingCounter;
@@ -49,7 +49,7 @@ public class Project implements Parcelable {
         this.description = description;
         this.semester = semester;
         this.year = year;
-        this.status = true;
+        this.isComplete = false;
     }
 
     public Project(DocumentReference creator, String title, String description, String semester, String year, List<String> tags) {
@@ -59,13 +59,14 @@ public class Project implements Parcelable {
         this.description = description;
         this.semester = semester;
         this.year = year;
-        this.status = true;
+        this.isComplete = false;
         this.tags = tags;
     }
 
+    // For parcelling
     public Project(String name, String creatorString, String semester, String year, List<String> supervisorsStringList,
                    List<String> supervisorsPendingStringList, List<String> membersStringList, String description, List<String> tags,
-                   List<String> imagePaths) {
+                   List<String> imagePaths, boolean isComplete) {
         this.name = name;
         this.creatorString = creatorString;
         this.semester = semester;
@@ -76,6 +77,7 @@ public class Project implements Parcelable {
         this.description = description;
         this.tags = tags;
         this.imagePaths = imagePaths;
+        this.isComplete = isComplete;
     }
 
     public void setCreator(DocumentReference creator) {
@@ -130,8 +132,8 @@ public class Project implements Parcelable {
         return tags;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setIsComplete(boolean isComplete) {
+        this.isComplete = isComplete;
     }
 
     public void setTags(List<String> tags) {
@@ -150,8 +152,8 @@ public class Project implements Parcelable {
         return year;
     }
 
-    public boolean getStatus() {
-        return status;
+    public boolean getIsComplete() {
+        return isComplete;
     }
 
     public List<DocumentReference> getSupervisorsPending() {
@@ -308,6 +310,14 @@ public class Project implements Parcelable {
         return name + " " + description + " " + semester + " " + year + " " + getSupervisorsString();
     }
 
+    public Timestamp getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Timestamp lastModified) {
+        this.lastModified = Timestamp.now();
+    }
+
     // Parcelling
     public Project(Parcel in){
         name = in.readString();
@@ -320,6 +330,7 @@ public class Project implements Parcelable {
         description = in.readString();
         tags = in.readArrayList(String.class.getClassLoader());
         imagePaths = in.readArrayList(String.class.getClassLoader());
+        isComplete = in.readBoolean();
     }
 
     @Override
@@ -339,6 +350,7 @@ public class Project implements Parcelable {
         dest.writeString(description);
         dest.writeList(tags);
         dest.writeList(imagePaths);
+        dest.writeBoolean(isComplete);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -350,13 +362,5 @@ public class Project implements Parcelable {
             return new Project[size];
         }
     };
-
-    public Timestamp getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Timestamp lastModified) {
-        this.lastModified = Timestamp.now();
-    }
 }
 
