@@ -4,10 +4,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 public class DeletableImageView extends LinearLayout {
     private ImageView imageView;
@@ -17,13 +21,15 @@ public class DeletableImageView extends LinearLayout {
     private Uri uri;
     private ImageButton buttonAttachImage;
     private HorizontalScrollView scrollViewImages;
+    private int clearButtonDistance;
 
-    public DeletableImageView(Context context, int i, ImageButton buttonAttachImage, HorizontalScrollView scrollViewImages) {
+    public DeletableImageView(Context context, int i, ImageButton buttonAttachImage, HorizontalScrollView scrollViewImages, int clearButtonDistance) {
         super(context);
-        init(context);
         index = i;
         this.buttonAttachImage = buttonAttachImage;
         this.scrollViewImages = scrollViewImages;
+        this.clearButtonDistance = clearButtonDistance;
+        init(context);
     }
 
     public DeletableImageView(Context context, AttributeSet attrs) {
@@ -37,7 +43,6 @@ public class DeletableImageView extends LinearLayout {
     }
 
     private void init(Context context) {
-        setOrientation(LinearLayout.VERTICAL);
         inflate(context, R.layout.deletable_image, this);
         initViews();
         imageView.setAdjustViewBounds(true);
@@ -46,6 +51,13 @@ public class DeletableImageView extends LinearLayout {
 
     private void initViews() {
         imageView = (ImageView) findViewById(R.id.image);
+
+        View cardViewDelete = findViewById(R.id.cardViewDelete);
+        ViewGroup.MarginLayoutParams p = (ConstraintLayout.MarginLayoutParams) cardViewDelete.getLayoutParams();
+        p.setMarginEnd(clearButtonDistance);
+//        p.setMargins(0, clearButtonDistance, 0, 0);
+        cardViewDelete.requestLayout();
+
         mButton = (ImageButton) findViewById(R.id.delete_button);
         mButton.setOnClickListener(new OnClickListener() {
             @Override

@@ -285,6 +285,7 @@ public class ProjectInformationActivity extends AppCompatActivity {
         linearLayoutImages.removeAllViews();
         for (String imagePath : imagePaths) {
             ImageView newImage = new ImageView(this);
+            newImage.setAdjustViewBounds(true);
             linearLayoutImages.addView(newImage);
             Picasso.get().load(imagePath).into(newImage);
         }

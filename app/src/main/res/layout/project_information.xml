@@ -4,7 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/constraintLayout_Inner"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:paddingTop="16dp"
+    android:paddingBottom="10dp">
     <uk.co.onemandan.materialtextview.MaterialTextView
         android:id="@+id/textViewTitle"
         android:layout_width="match_parent"
@@ -91,22 +93,22 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="5dp"
         app:mtv_labelText="Tags"
-        app:layout_constraintBottom_toTopOf="@+id/checkBox_StatusProf"
+        app:layout_constraintBottom_toTopOf="@+id/textViewDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewDescription" />
 
-    <CheckBox
-        android:id="@+id/checkBox_StatusProf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Available"
-        android:enabled="false"
-        app:layout_constraintHorizontal_bias="0.118"
-        app:layout_constraintBottom_toTopOf="@+id/textViewImages"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTags" />
+<!--    <CheckBox-->
+<!--        android:id="@+id/checkBox_StatusProf"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Available"-->
+<!--        android:enabled="false"-->
+<!--        app:layout_constraintHorizontal_bias="0.118"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/textViewImages"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textViewTags" />-->
 
     <TextView
         android:id="@+id/textViewImages"
@@ -120,18 +122,17 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayoutImages"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox_StatusProf" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewTags" />
 
     <LinearLayout
         android:id="@+id/linearLayoutImages"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTags">
+        app:layout_constraintTop_toBottomOf="@+id/textViewImages">
     </LinearLayout>
 
     <Button
@@ -139,8 +140,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Mark as complete"
+        android:layout_marginTop="8dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutImages"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

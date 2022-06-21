@@ -31,23 +31,18 @@ import android.widget.Toast;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -58,10 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Observer;
 
-import ca.macewan.capstone.adapter.SharedMethods;
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
 
@@ -469,6 +461,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 int inbetweenImagesMargin = (int) dpToPx(6);
                 // Not sure why we need to add 50 but it gives the images the perfect width
                 int imageViewWidth = (width/2) - edgeOfScreenMargin - edgeOfScreenMargin - inbetweenImagesMargin + 50;
+                int clearButtonDistance = (int) (imageViewWidth * 0.15);
                 LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(imageViewWidth, ViewGroup.LayoutParams.MATCH_PARENT);
                 String filePath;
                 DeletableImageView imageView;
@@ -480,7 +473,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                     filePath = images.get(0).getPath();
                     parms.rightMargin = inbetweenImagesMargin;
                     parms.leftMargin = edgeOfScreenMargin;
-                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages);
+                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages, clearButtonDistance);
                     imageView.setImage(filePath);
                     imageView.setLinearLayout(linearLayoutImages);
                     imageView.setLayoutParams(parms);
@@ -493,7 +486,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 parms.rightMargin = inbetweenImagesMargin;
                 for (; i < newSize; i++) {
                     filePath = images.get(index).getPath();
-                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages);
+                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages, clearButtonDistance);
                     imageView.setImage(filePath);
                     imageView.setLinearLayout(linearLayoutImages);
                     imageView.setLayoutParams(parms);

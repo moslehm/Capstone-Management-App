@@ -21,6 +21,7 @@
 <!--        app:layout_constraintEnd_toEndOf="@+id/image"-->
 <!--        app:layout_constraintTop_toTopOf="@+id/image" />-->
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -36,7 +37,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:background="@null"
-            android:contentDescription="TODO"
+            android:contentDescription="Delete Button"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_clear" />
     </androidx.cardview.widget.CardView>

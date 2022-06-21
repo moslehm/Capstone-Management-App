@@ -1,11 +1,9 @@
 package ca.macewan.capstone;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -24,7 +22,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.esafirm.imagepicker.features.ImagePicker;
@@ -36,13 +33,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -51,12 +45,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
-import me.srodrigo.androidhintspinner.HintAdapter;
-import me.srodrigo.androidhintspinner.HintSpinner;
 
 public class ProposalEditActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -138,6 +127,44 @@ public class ProposalEditActivity extends AppCompatActivity {
                 projectRef.update("description", editTextDescription.getText().toString());
                 projectRef.update("tags", tags);
                 projectRef.update("lastModified", Timestamp.now());
+
+                String projectID = projectRef.getId();
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                StorageReference imageRef = null;
+                List<UploadTask> myTasks = new ArrayList<>();
+                for (int i = 0; i < linearLayoutImages.getChildCount() - 1; i++) {
+                    DeletableImageView image = (DeletableImageView) linearLayoutImages.getChildAt(i);
+                    imageRef = storageRef.child("project_images/" + projectID + "/" + image.getUri().getLastPathSegment());
+                    InputStream stream = null;
+                    try {
+                        stream = new FileInputStream(image.getUri().getPath());
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    myTasks.add(imageRef.putStream(stream));
+                }
+                Tasks.whenAllSuccess(myTasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                    @Override
+                    public void onSuccess(List<Object> objects) {
+                        List<Task<Uri>> tasks = new ArrayList<Task<Uri>>();
+                        for (Object object : objects) {
+                            UploadTask.TaskSnapshot snapshot = (UploadTask.TaskSnapshot) object;
+                            tasks.add(snapshot.getMetadata().getReference().getDownloadUrl());
+                        }
+                        Tasks.whenAllSuccess(tasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                            @Override
+                            public void onSuccess(List<Object> objects) {
+//                                List<String> imagePaths = new ArrayList<String>();
+                                for (Object object : objects) {
+                                    Uri uri = (Uri) object;
+//                                    imagePaths.add(uri.toString());
+                                    projectRef.update("imagePaths", FieldValue.arrayUnion(uri.toString()));
+                                }
+                                finish();
+                            }
+                        });
+                    }
+                });
                 finish();
             }
         });
@@ -287,6 +314,7 @@ public class ProposalEditActivity extends AppCompatActivity {
                 int inbetweenImagesMargin = (int) dpToPx(6);
                 // Not sure why we need to add 50 but it gives the images the perfect width
                 int imageViewWidth = (width/2) - edgeOfScreenMargin - edgeOfScreenMargin - inbetweenImagesMargin + 50;
+                int clearButtonDistance = (int) (imageViewWidth * 0.25);
                 LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(imageViewWidth, ViewGroup.LayoutParams.MATCH_PARENT);
                 String filePath;
                 DeletableImageView imageView;
@@ -298,7 +326,7 @@ public class ProposalEditActivity extends AppCompatActivity {
                     filePath = images.get(0).getPath();
                     parms.rightMargin = inbetweenImagesMargin;
                     parms.leftMargin = edgeOfScreenMargin;
-                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages);
+                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages, clearButtonDistance);
                     imageView.setImage(filePath);
                     imageView.setLinearLayout(linearLayoutImages);
                     imageView.setLayoutParams(parms);
@@ -311,7 +339,7 @@ public class ProposalEditActivity extends AppCompatActivity {
                 parms.rightMargin = inbetweenImagesMargin;
                 for (; i < newSize; i++) {
                     filePath = images.get(index).getPath();
-                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages);
+                    imageView = new DeletableImageView(this, i, buttonAttachImage, scrollViewImages, clearButtonDistance);
                     imageView.setImage(filePath);
                     imageView.setLinearLayout(linearLayoutImages);
                     imageView.setLayoutParams(parms);
