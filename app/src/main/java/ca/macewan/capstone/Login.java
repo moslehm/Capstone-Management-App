@@ -1,5 +1,6 @@
 package ca.macewan.capstone;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -74,25 +76,34 @@ public class Login extends AppCompatActivity {
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
                                     DocumentSnapshot documentSnapshot = task.getResult();
-                                    Toast toast = null;
                                     if (documentSnapshot.exists()) {
                                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                         startActivity(intent);
                                     }
                                     else {
                                         // Login success but no role was assigned
-                                        toast = Toast.makeText(getApplicationContext(),
-                                                "Please contact admin for adding role",
-                                                Toast.LENGTH_LONG);
-                                        toast.show();
+                                        new MaterialAlertDialogBuilder(Login.this)
+                                                .setMessage("No profile was created for this user.")
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                    }
+                                                })
+                                                .show();
                                     }
                                 }
                             }
                         });
                     } else {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Failed!",
-                                Toast.LENGTH_SHORT);
-                        toast.show();
+                        new MaterialAlertDialogBuilder(Login.this)
+                                .setMessage("Authentication failed!")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .show();
+
                     }
                 }
             });
@@ -101,7 +112,6 @@ public class Login extends AppCompatActivity {
 
     private void signUp() {
         Intent intent = new Intent(getApplicationContext(), Signup.class);
-
         startActivity(intent);
     }
 }
