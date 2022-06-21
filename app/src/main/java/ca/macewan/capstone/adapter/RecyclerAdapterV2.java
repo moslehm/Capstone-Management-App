@@ -122,6 +122,7 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
         Project project = projectsToDisplay.get(key);
         holder.textView_pTitle.setText(project.getName());
         holder.textView_pCreator.setText(project.getCreatorString());
+        holder.textView_pTerm.setText(project.getSemester() + " " + project.getYear());
 
 //        holder.viewProgressBarBackground.setVisibility(View.GONE);
 //        holder.progressBar.setVisibility(View.GONE);
