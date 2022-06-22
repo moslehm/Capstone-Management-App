@@ -137,7 +137,8 @@ public class SettingsFragment extends Fragment {
                                     return;
                                 }
                                 String token = task.getResult();
-                                tokenThread(token);
+                                NotifClient notifier = new NotifClient();
+                                notifier.tokenThread(notifier.payloadConstructor("Title", "Body", "projectChange", null));
                             }
                         });
             }
@@ -153,33 +154,5 @@ public class SettingsFragment extends Fragment {
                 startActivity(new Intent(getActivity(), Login.class));
             }
         });
-    }
-
-    private void tokenThread(final String token) {
-        Thread t = new Thread(() -> {
-            try {
-                sendToken(token);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        });
-        t.start();
-    }
-
-    private void sendToken(String token) throws IOException, JSONException {
-        Socket socket = null;
-        OutputStreamWriter output = null;
-        socket = new Socket("34.168.78.99", 10000);
-        System.out.println("Connected");
-        output = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
-        JSONObject json = new JSONObject();
-        json.put("token", token);
-        json.put("topicA", "notifsEnabled");
-        json.put("topicB", "projectJoin");
-        output.write(json.toString());
-        output.close();
-        socket.close();
     }
 }
