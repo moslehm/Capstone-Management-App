@@ -101,10 +101,12 @@ public class ProfileActivity extends AppCompatActivity {
                                 if (user.role.equals("professor")) {
                                     profAvail.setVisibility(View.VISIBLE);
                                     profAvailChips.setVisibility(View.VISIBLE);
-                                    chipSpring.setChecked(user.availability.get("Spring"));
-                                    chipSummer.setChecked(user.availability.get("Summer"));
-                                    chipFall.setChecked(user.availability.get("Fall"));
-                                    chipWinter.setChecked(user.availability.get("Winter"));
+                                    if (user.availability != null) {
+                                        chipSpring.setChecked(user.availability.get("Spring"));
+                                        chipSummer.setChecked(user.availability.get("Summer"));
+                                        chipFall.setChecked(user.availability.get("Fall"));
+                                        chipWinter.setChecked(user.availability.get("Winter"));
+                                    }
                                 }
                             } else {
                                 finish();
