@@ -58,6 +58,8 @@ import java.util.Objects;
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 
 public class ProposalCreationActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -171,6 +173,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                 inviteSupervisors(projectRef);
                                 creator.update("projects", FieldValue.arrayUnion(projectRef.getId()));
                                 if (linearLayoutImages.getChildCount() - 1 == 0) {
+                                    FirebaseMessaging.getInstance().subscribeToTopic(projectRef.getId());
                                     finish();
                                 }
                                 uploadImages(projectRef);
@@ -210,6 +213,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                                 imagePaths.add(uri.toString());
                                             }
                                             projectRef.update("imagePaths", imagePaths);
+                                            FirebaseMessaging.getInstance().subscribeToTopic(projectID);
                                             finish();
                                         }
                                     });

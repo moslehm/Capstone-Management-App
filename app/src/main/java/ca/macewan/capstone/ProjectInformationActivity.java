@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -444,6 +445,8 @@ public class ProjectInformationActivity extends AppCompatActivity {
                     updateUser();
                     // Update project to show any changes made
                     updateProject();
+                    // Subscribe to notifications for this project
+                    FirebaseMessaging.getInstance().subscribeToTopic(projectRef.getId());
                 }
             });
         }
