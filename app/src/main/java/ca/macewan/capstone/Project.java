@@ -307,7 +307,11 @@ public class Project implements Parcelable {
 
     @Exclude
     public String getAllStrings() {
-        return name + " " + description + " " + semester + " " + year + " " + getSupervisorsString();
+        return name + " " + description + " " + semester + " " + year + " " + getSupervisorsString() + " " + getTagsString();
+    }
+
+    private String getTagsString() {
+        return String.join(" ", tags);
     }
 
     public Timestamp getLastModified() {
