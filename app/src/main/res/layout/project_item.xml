@@ -57,7 +57,7 @@
         android:background="@android:color/transparent"
         android:paddingStart="2dp"
         android:paddingEnd="2dp"
-        android:text="Creator"
+        android:text="Semester and year"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/textView_pTags"
         app:layout_constraintEnd_toStartOf="@id/imageView_status"

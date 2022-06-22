@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import me.srodrigo.androidhintspinner.HintAdapter;
 import me.srodrigo.androidhintspinner.HintSpinner;
@@ -64,7 +65,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
     String selectedSemester;
     ArrayList<User> arrayListSupervisors;
     boolean[] selectedSupervisors;
-    ArrayList<Integer> supervisorList = new ArrayList<>();
+    ArrayList<Integer> supervisorList;
     private EditText editTextSupervisors, editTextKeyword;
     public AlertDialog alertDialogSupervisor;
     List<String> tags;
@@ -90,11 +91,11 @@ public class ProposalCreationActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-        String[] semesters = {"Fall", "Winter", "Spring", "Summer"};
+        String[] semesters = {"Fall", "Winter", "Spring", "Summer", "Spring/Summer"};
         Spinner semestersSpinner = (Spinner) findViewById(R.id.spinnerSemester);
         addSpinner(semestersSpinner, semesters, "Semester");
 
-        setupSupervisors();
+        refreshSupervisors();
         setupTagChips();
         setupImageAttachment();
         setupSubmitButton();
@@ -246,14 +247,16 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     public boolean anySupervisorsSelected() {
-        for (boolean val : selectedSupervisors) {
-            if (val)
-                return true;
+        if (selectedSupervisors != null) {
+            for (boolean val : selectedSupervisors) {
+                if (val)
+                    return true;
+            }
         }
         return false;
     }
 
-    private void setupSupervisors() {
+    private void refreshSupervisors() {
         arrayListSupervisors = new ArrayList<User>();
         db.collection("Users")
                 .whereEqualTo("role", "professor")
@@ -263,7 +266,18 @@ public class ProposalCreationActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                arrayListSupervisors.add(document.toObject(User.class));
+                                User supervisor = document.toObject(User.class);
+                                if (selectedSemester != null && supervisor.availability != null) {
+                                    if (Objects.equals(selectedSemester, "Spring/Summer")){
+                                        if (Boolean.TRUE.equals(supervisor.availability.get("Spring")) && Boolean.TRUE.equals(supervisor.availability.get("Summer"))){
+                                            arrayListSupervisors.add(supervisor);
+                                        }
+                                    } else if (Boolean.TRUE.equals(supervisor.availability.get(selectedSemester))) {
+                                        arrayListSupervisors.add(supervisor);
+                                    }
+//                                    continue;
+                                }
+//                                arrayListSupervisors.add(supervisor);
                             }
                             populateAlertDialog();
                         }
@@ -272,12 +286,16 @@ public class ProposalCreationActivity extends AppCompatActivity {
     }
 
     private void populateAlertDialog() {
-        String[] supervisors = new String[arrayListSupervisors.size()];
-        for (int i = 0; i < arrayListSupervisors.size(); i++){
-            supervisors[i] = arrayListSupervisors.get(i).name;
-        }
+        int size = arrayListSupervisors.size();
+        String[] supervisors = new String[size];
+        supervisorList = new ArrayList<>();
         editTextSupervisors = findViewById(R.id.editTextSupervisors);
-        selectedSupervisors = new boolean[supervisors.length];
+        if (size != 0) {
+            for (int i = 0; i < size; i++) {
+                supervisors[i] = arrayListSupervisors.get(i).name;
+            }
+            selectedSupervisors = new boolean[supervisors.length];
+        }
 
         editTextSupervisors.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,32 +310,45 @@ public class ProposalCreationActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ProposalCreationActivity.this);
                 builder.setTitle("Supervisor(s)");
                 builder.setCancelable(false);
-                builder.setMultiChoiceItems(supervisors, selectedSupervisors, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i, boolean boxChecked) {
-                        if (boxChecked) {
-                            supervisorList.add(i);
-                            Collections.sort(supervisorList);
-                        } else {
-                            supervisorList.remove(Integer.valueOf(i));
+                if (size == 0) {
+                    if (selectedSemester == null)
+                        builder.setMessage("You must select a semester first");
+                    else
+                        builder.setMessage("There are no supervisors available for that semester");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
                         }
-                        checkRequiredFields();
-                    }
-                });
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // Put supervisor names together for the EditText
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (int j = 0; j < supervisorList.size(); j++) {
-                            stringBuilder.append(supervisors[supervisorList.get(j)]);
-                            if (j != supervisorList.size() - 1) {
-                                stringBuilder.append(", ");
+                    });
+                } else {
+                    builder.setMultiChoiceItems(supervisors, selectedSupervisors, new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i, boolean boxChecked) {
+                            if (boxChecked) {
+                                supervisorList.add(i);
+                                Collections.sort(supervisorList);
+                            } else {
+                                supervisorList.remove(Integer.valueOf(i));
                             }
+                            checkRequiredFields();
                         }
-                        editTextSupervisors.setText(stringBuilder.toString());
-                    }
-                });
+                    });
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            editTextSupervisors.setText("");
+                            // Put supervisor names together for the EditText
+                            StringBuilder stringBuilder = new StringBuilder();
+                            for (int j = 0; j < supervisorList.size(); j++) {
+                                stringBuilder.append(supervisors[supervisorList.get(j)]);
+                                if (j != supervisorList.size() - 1) {
+                                    stringBuilder.append(", ");
+                                }
+                            }
+                            editTextSupervisors.setText(stringBuilder.toString());
+                        }
+                    });
+                }
                 alertDialogSupervisor = builder.show();
             }
         });
@@ -332,7 +363,10 @@ public class ProposalCreationActivity extends AppCompatActivity {
                     @Override
                     public void onItemSelected(int position, String itemAtPosition) {
                         // Semester selected here
+                        if (!Objects.equals(selectedSemester, itemAtPosition))
+                        editTextSupervisors.setText("");
                         selectedSemester = itemAtPosition;
+                        refreshSupervisors();
                         checkRequiredFields();
                     }
                 });

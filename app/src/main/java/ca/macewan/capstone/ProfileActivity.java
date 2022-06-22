@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,6 +37,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class ProfileActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
@@ -91,7 +93,9 @@ public class ProfileActivity extends AppCompatActivity {
                                 editPhone.setText(user.phone);
 
                                 if (user.role.equals("professor")) {
+                                    setAvail(user.availability);
                                     profAvail.setVisibility(View.VISIBLE);
+                                    setAvailChipEnable(false);
                                     profAvailChips.setVisibility(View.VISIBLE);
                                 }
                             } else {
@@ -142,22 +146,43 @@ public class ProfileActivity extends AppCompatActivity {
                         editName.setEnabled(true);
                         editEmail.setEnabled(false);
                         editPhone.setEnabled(true);
+                        setAvailChipEnable(true);
                         item.setIcon(R.drawable.ic_baseline_save_24);
                     } else {
+                        HashMap<String, Boolean> availSelected = getAvail();
+
                         Toast.makeText(this, "Saving...", Toast.LENGTH_LONG).show();
                         user.update(
                                 "email", editEmail.getText().toString(),
                                 "name", editName.getText().toString(),
-                                "phone", editPhone.getText().toString()
+                                "phone", editPhone.getText().toString(),
+                                "availability", availSelected
                         );
                         editName.setEnabled(false);
                         editEmail.setEnabled(false);
                         editPhone.setEnabled(false);
+                        setAvailChipEnable(false);
                         item.setIcon(R.drawable.ic_baseline_edit_24);
                     }
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private HashMap<String, Boolean> getAvail() {
+        HashMap<String, Boolean> chipsSelected = new HashMap<String, Boolean>();
+        for (int i=0; i < profAvailChips.getChildCount(); i++){
+            Chip chip = (Chip) profAvailChips.getChildAt(i);
+            chipsSelected.put(chip.getText().toString(), chip.isChecked());
+        }
+        return chipsSelected;
+    }
+
+    private void setAvail(HashMap<String, Boolean> avail) {
+        for (int i=0; i < profAvailChips.getChildCount(); i++){
+            Chip chip = (Chip) profAvailChips.getChildAt(i);
+            chip.setChecked(Boolean.TRUE.equals(avail.get(chip.getText().toString())));
+        }
     }
 
     private void changePassword() {
@@ -236,6 +261,12 @@ public class ProfileActivity extends AppCompatActivity {
             if (bitmap != null) {
                 profilePicture.setImageBitmap(bitmap);
             }
+        }
+    }
+
+    public void setAvailChipEnable(boolean status) {
+        for (int i = 0; i < profAvailChips.getChildCount(); i++) {
+            profAvailChips.getChildAt(i).setClickable(status);
         }
     }
 }

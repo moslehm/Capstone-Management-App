@@ -3,6 +3,7 @@ package ca.macewan.capstone;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 
+import java.util.HashMap;
 import java.util.List;
 
 @IgnoreExtraProperties
@@ -13,6 +14,7 @@ public class User {
     public String phone;
     public List<String> projects;
     public String picture;
+    public HashMap<String, Boolean> availability;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
