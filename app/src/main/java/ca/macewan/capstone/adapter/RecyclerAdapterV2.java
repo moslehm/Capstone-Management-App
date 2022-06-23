@@ -127,8 +127,9 @@ public class RecyclerAdapterV2 extends RecyclerView.Adapter<RecyclerAdapterV2.Vi
 //        holder.viewProgressBarBackground.setVisibility(View.GONE);
 //        holder.progressBar.setVisibility(View.GONE);
         holder.textView_Tags.setText(null);
-        for (String tag : project.getTags())
-            holder.textView_Tags.append(tag + " ");
+        holder.textView_Tags.setText(project.getTagsString());
+//        for (String tag : project.getTags())
+//            holder.textView_Tags.append(tag + ", ");
     }
 
     public static String getHashMapKeyFromIndex(HashMap hashMap, int index) {
