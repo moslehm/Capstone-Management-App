@@ -57,8 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class PreferencesFragment extends PreferenceFragmentCompat {
-        CheckBoxPreference notifsEnabled, notifsChange, notifsJoin, notifsSupervisorAccept;
-        SwitchPreference darkMode;
+        CheckBoxPreference notifsEnabled, notifsChange, notifsJoin, notifsQuit, notifsSupervisorAccept;
         SharedPreferences prefs;
 
         Preference.OnPreferenceChangeListener notifListener = new Preference.OnPreferenceChangeListener() {
@@ -81,26 +80,16 @@ public class SettingsActivity extends AppCompatActivity {
             notifsEnabled = findPreference("notifsEnabled");
             notifsChange = findPreference("projectChange");
             notifsJoin = findPreference("projectJoin");
+            notifsQuit = findPreference("projectQuit");
             notifsSupervisorAccept = findPreference("supervisorJoin");
-            darkMode = findPreference("darkMode");
             prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
 
             notifsEnabled.setOnPreferenceChangeListener(notifListener);
             notifsChange.setOnPreferenceChangeListener(notifListener);
+            notifsQuit.setOnPreferenceChangeListener(notifListener);
             notifsJoin.setOnPreferenceChangeListener(notifListener);
             notifsSupervisorAccept.setOnPreferenceChangeListener(notifListener);
-            darkMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    Resources.Theme theme = getContext().getTheme();
-                    if (newValue == Boolean.TRUE) {
-                        theme.applyStyle(R.style.Theme_Capstone_Night, true);
-                    } else {
-                        theme.applyStyle(R.style.Theme_Capstone, true);
-                    }
-                    return true;
-                }
-            });
+
 
             System.out.print(prefs.toString());
         }

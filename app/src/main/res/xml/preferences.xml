@@ -22,15 +22,13 @@
         android:title="On project join" />
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="projectQuit"
+        android:summary="Notify when someone leaves the project"
+        android:title="On project leave" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:dependency="notifsEnabled"
         android:key="supervisorJoin"
         android:summary="Notify when a supervisor agrees to supervise the project"
-        android:dependency="notifsEnabled"
-        android:title="On supervisor accept" />
-    <PreferenceCategory android:title="Display">
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="darkMode"
-            android:title="Dark Mode" />
-    </PreferenceCategory>
+        android:title="On supervisor join" />
 </PreferenceScreen>

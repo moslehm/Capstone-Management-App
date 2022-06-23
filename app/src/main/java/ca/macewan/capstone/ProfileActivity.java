@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,6 +37,8 @@ import com.google.firebase.storage.UploadTask;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
@@ -43,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
     EditText editName, editEmail, editPhone;
     TextView changePassword, role, profAvail, changePhoto, deleteAccount;
     ChipGroup profAvailChips;
+    Chip chipSpring, chipSummer, chipFall, chipWinter;
     Menu menu;
     DocumentReference user;
     int SELECT_PICTURE = 200;
@@ -62,6 +66,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         profAvail = findViewById(R.id.profileProfAvail);
         profAvailChips = findViewById(R.id.profileProfAvailChips);
+        chipSpring = findViewById(R.id.profileSpringChip);
+        chipSummer = findViewById(R.id.profileSummerChip);
+        chipFall = findViewById(R.id.profileFallChip);
+        chipWinter = findViewById(R.id.profileWinterChip);
 
         profilePicture = findViewById(R.id.profilePicture);
         profilePicture.setImageResource(R.drawable.ic_baseline_person_24);
@@ -93,6 +101,12 @@ public class ProfileActivity extends AppCompatActivity {
                                 if (user.role.equals("professor")) {
                                     profAvail.setVisibility(View.VISIBLE);
                                     profAvailChips.setVisibility(View.VISIBLE);
+                                    if (user.availability != null) {
+                                        chipSpring.setChecked(user.availability.get("Spring"));
+                                        chipSummer.setChecked(user.availability.get("Summer"));
+                                        chipFall.setChecked(user.availability.get("Fall"));
+                                        chipWinter.setChecked(user.availability.get("Winter"));
+                                    }
                                 }
                             } else {
                                 finish();
@@ -142,17 +156,40 @@ public class ProfileActivity extends AppCompatActivity {
                         editName.setEnabled(true);
                         editEmail.setEnabled(false);
                         editPhone.setEnabled(true);
+                        chipSpring.setEnabled(true);
+                        chipSummer.setEnabled(true);
+                        chipFall.setEnabled(true);
+                        chipWinter.setEnabled(true);
+
                         item.setIcon(R.drawable.ic_baseline_save_24);
                     } else {
                         Toast.makeText(this, "Saving...", Toast.LENGTH_LONG).show();
-                        user.update(
-                                "email", editEmail.getText().toString(),
-                                "name", editName.getText().toString(),
-                                "phone", editPhone.getText().toString()
-                        );
+                        if (role.getText().equals("professor")) {
+                            Map<String, Boolean> availability = new HashMap<String, Boolean>();
+                            availability.put("Spring", chipSpring.isChecked());
+                            availability.put("Summer", chipSummer.isChecked());
+                            availability.put("Fall", chipFall.isChecked());
+                            availability.put("Winter", chipWinter.isChecked());
+                            user.update(
+                                    "email", editEmail.getText().toString(),
+                                    "name", editName.getText().toString(),
+                                    "phone", editPhone.getText().toString(),
+                                    "availability", availability
+                            );
+                        } else {
+                            user.update(
+                                    "email", editEmail.getText().toString(),
+                                    "name", editName.getText().toString(),
+                                    "phone", editPhone.getText().toString()
+                            );
+                        }
                         editName.setEnabled(false);
                         editEmail.setEnabled(false);
                         editPhone.setEnabled(false);
+                        chipSpring.setEnabled(false);
+                        chipSummer.setEnabled(false);
+                        chipFall.setEnabled(false);
+                        chipWinter.setEnabled(false);
                         item.setIcon(R.drawable.ic_baseline_edit_24);
                     }
                 return true;

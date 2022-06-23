@@ -10,12 +10,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,9 +23,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -211,6 +209,19 @@ public class ProjectInformationActivity extends AppCompatActivity {
                                 // remove request from invited array
                                 userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 profButtonsLayout.setVisibility(View.GONE);
+                                NotifClient notifier = new NotifClient();
+                                userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            notifier.payloadThread(notifier.payloadConstructor(
+                                                    String.format("%s has a new supervisor!", project.getName()),
+                                                    String.format("%s is now supervising the project.", task.getResult().get("name")),
+                                                    "supervisorJoin",
+                                                    projectID));
+                                        }
+                                    }
+                                });
                                 updateProject();
                                 updateUser();
                             }
@@ -369,18 +380,21 @@ public class ProjectInformationActivity extends AppCompatActivity {
 
         if (!project.getIsComplete()) {
             boolean userJoined = false;
-            if (user.projects != null) {
-                for (String projectId : user.projects) {
-                    if (projectId.equals(projectRef.getId())) {
-                        userJoined = true;
-                        break;
-                    }
+            if (user.projects == null) {
+                menu.findItem(R.id.action_join).setVisible(true);
+                return;
+            }
+
+            for (String projectId : user.projects) {
+                if (projectId.equals(projectRef.getId())) {
+                    userJoined = true;
+                    break;
                 }
-                if (!userJoined) {
-                    if (!isSupervisor)
-                        menu.findItem(R.id.action_join).setVisible(true);
-                    return;
-                }
+            }
+            if (!userJoined) {
+                if (!isSupervisor)
+                    menu.findItem(R.id.action_join).setVisible(true);
+                return;
             }
 
             projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -444,6 +458,8 @@ public class ProjectInformationActivity extends AppCompatActivity {
                     updateUser();
                     // Update project to show any changes made
                     updateProject();
+                    // Subscribe to notifications for this project
+                    FirebaseMessaging.getInstance().subscribeToTopic(projectRef.getId());
                 }
             });
         }

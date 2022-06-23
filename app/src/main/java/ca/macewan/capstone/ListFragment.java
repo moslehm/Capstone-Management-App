@@ -274,6 +274,18 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
             // TODO: make search lose focus and maybe clear it?
             recyclerAdapter.search("");
         }
+        if (!hidden){
+            onListListener.onListUpdate(screenType, new OnUpdateListener() {
+                @Override
+                public void onUpdateComplete(ArrayList<String> projectIds) {
+                    refresh(projectIds, new EventCompleteListener() {
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+                }
+            });
+        }
     }
 
     public void setListener(OnListListener onListListener) {

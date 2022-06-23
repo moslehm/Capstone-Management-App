@@ -176,6 +176,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:visibility="gone"
+            android:enabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profileProfAvail"
@@ -186,6 +187,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
+                android:enabled="false"
                 android:text="@string/fall" />
 
             <com.google.android.material.chip.Chip
@@ -193,6 +195,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
+                android:enabled="false"
                 android:text="@string/winter" />
 
             <com.google.android.material.chip.Chip
@@ -200,6 +203,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
+                android:enabled="false"
                 android:text="@string/spring" />
 
             <com.google.android.material.chip.Chip
@@ -207,6 +211,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="true"
+                android:enabled="false"
                 android:text="@string/summer" />
         </com.google.android.material.chip.ChipGroup>
 

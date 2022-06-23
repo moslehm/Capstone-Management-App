@@ -168,19 +168,12 @@ public class Project implements Parcelable {
         this.supervisors = supervisors;
     }
 
-    @Exclude
-    public DocumentReference getProjectRef() {
-        return projectRef;
+    public Timestamp getLastModified() {
+        return lastModified;
     }
 
-    @Exclude
-    public void setProjectRef(DocumentReference projectRef) {
-        this.projectRef = projectRef;
-    }
-
-    @Exclude
-    public String getCreatorString() {
-        return creatorString;
+    public void setLastModified(Timestamp lastModified) {
+        this.lastModified = Timestamp.now();
     }
 
     private void setCreatorString(EventCompleteListener eventCompleteListener) {
@@ -276,6 +269,21 @@ public class Project implements Parcelable {
     }
 
     @Exclude
+    public DocumentReference getProjectRef() {
+        return projectRef;
+    }
+
+    @Exclude
+    public void setProjectRef(DocumentReference projectRef) {
+        this.projectRef = projectRef;
+    }
+
+    @Exclude
+    public String getCreatorString() {
+        return creatorString;
+    }
+
+    @Exclude
     public String getMembersString() {
         return String.join("\n", membersStringList);
     }
@@ -307,15 +315,12 @@ public class Project implements Parcelable {
 
     @Exclude
     public String getAllStrings() {
-        return name + " " + description + " " + semester + " " + year + " " + getSupervisorsString();
+        return name + " " + description + " " + semester + " " + year + " " + getSupervisorsString() + " " + getTagsString();
     }
 
-    public Timestamp getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Timestamp lastModified) {
-        this.lastModified = Timestamp.now();
+    @Exclude
+    public String getTagsString() {
+        return String.join(", ", tags);
     }
 
     // Parcelling
