@@ -151,7 +151,9 @@ public class SettingsFragment extends Fragment {
                         Toast.LENGTH_SHORT);
 
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getActivity(), Login.class));
+                Intent i = new Intent(getActivity(), Login.class);
+                i.putExtra("signout", 1);
+                startActivity(i);
             }
         });
     }
