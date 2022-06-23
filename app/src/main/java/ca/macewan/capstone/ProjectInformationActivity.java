@@ -36,7 +36,6 @@ public class ProjectInformationActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String projectID;
     DocumentReference projectRef;
-    List<DocumentReference> memberRefList;
     String email;
     private Menu menu;
     private DocumentReference userRef;

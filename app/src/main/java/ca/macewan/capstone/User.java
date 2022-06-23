@@ -1,6 +1,5 @@
 package ca.macewan.capstone;
 
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 
 import java.util.List;

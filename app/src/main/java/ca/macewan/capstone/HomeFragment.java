@@ -204,10 +204,7 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
             currentState = OTHER;
             if (prevSize - size != 0) {
                 SharedMethods.showFragment(getChildFragmentManager(), listFragment);
-//                textViewDefault.setVisibility(View.GONE);
                 singleProjectView.setVisibility(View.GONE);
-//                swipeRefreshRecycler.setEnabled(true);
-//                swipeRefreshRecycler.setVisibility(View.VISIBLE);
                 swipeRefreshSingleProject.setEnabled(false);
                 swipeRefreshSingleProject.setVisibility(View.GONE);
                 requireActivity().invalidateOptionsMenu();
@@ -246,7 +243,7 @@ public class HomeFragment extends Fragment implements ListFragment.OnListListene
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflate menu
+        // inflate menu
         inflater.inflate(R.menu.menu_information_proposal, menu);
         if (currentState == OTHER) {
             menu.findItem(R.id.action_edit).setVisible(false);

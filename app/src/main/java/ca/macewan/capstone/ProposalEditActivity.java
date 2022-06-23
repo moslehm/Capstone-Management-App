@@ -366,10 +366,9 @@ public class ProposalEditActivity extends AppCompatActivity {
     public float dpToPx(final float dp) {
         return dp * this.getResources().getDisplayMetrics().density;
     }
+
     // Makes EditTexts lose focus when appropriate
-
     // Reference: https://stackoverflow.com/a/61290481
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
