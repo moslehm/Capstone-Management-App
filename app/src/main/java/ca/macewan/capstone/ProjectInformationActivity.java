@@ -380,18 +380,21 @@ public class ProjectInformationActivity extends AppCompatActivity {
 
         if (!project.getIsComplete()) {
             boolean userJoined = false;
-            if (user.projects != null) {
-                for (String projectId : user.projects) {
-                    if (projectId.equals(projectRef.getId())) {
-                        userJoined = true;
-                        break;
-                    }
+            if (user.projects == null) {
+                menu.findItem(R.id.action_join).setVisible(true);
+                return;
+            }
+
+            for (String projectId : user.projects) {
+                if (projectId.equals(projectRef.getId())) {
+                    userJoined = true;
+                    break;
                 }
-                if (!userJoined) {
-                    if (!isSupervisor)
-                        menu.findItem(R.id.action_join).setVisible(true);
-                    return;
-                }
+            }
+            if (!userJoined) {
+                if (!isSupervisor)
+                    menu.findItem(R.id.action_join).setVisible(true);
+                return;
             }
 
             projectRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
