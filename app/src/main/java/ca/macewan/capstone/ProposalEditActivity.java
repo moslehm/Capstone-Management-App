@@ -165,6 +165,10 @@ public class ProposalEditActivity extends AppCompatActivity {
                         });
                     }
                 });
+                NotifClient notifier = new NotifClient();
+                notifier.payloadThread(notifier.payloadConstructor(
+                        String.format("%s has received changes!", editTextTitle.getText().toString()),
+                        "Check them out now!", "projectChange", projectID));
                 finish();
             }
         });

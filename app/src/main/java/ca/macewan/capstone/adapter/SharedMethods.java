@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -24,9 +23,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import ca.macewan.capstone.EventCompleteListener;
+import ca.macewan.capstone.NotifClient;
 import ca.macewan.capstone.R;
 import uk.co.onemandan.materialtextview.MaterialTextView;
 
@@ -181,6 +180,7 @@ public class SharedMethods {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         projectRef.update("members", FieldValue.arrayUnion(userRef));
                         userRef.update("projects", FieldValue.arrayUnion(projectRef.getId()));
+                        new NotifClient().joinThread(userRef, projectRef);
                         eventCompleteListener.onComplete();
                     }
                 })

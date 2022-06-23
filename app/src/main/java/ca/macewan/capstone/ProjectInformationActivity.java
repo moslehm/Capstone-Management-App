@@ -10,12 +10,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,7 +26,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -212,6 +209,19 @@ public class ProjectInformationActivity extends AppCompatActivity {
                                 // remove request from invited array
                                 userRef.update("invited", FieldValue.arrayRemove(projectRef.getId()));
                                 profButtonsLayout.setVisibility(View.GONE);
+                                NotifClient notifier = new NotifClient();
+                                userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            notifier.payloadThread(notifier.payloadConstructor(
+                                                    String.format("%s has a new supervisor!", project.getName()),
+                                                    String.format("%s is now supervising the project.", task.getResult().get("name")),
+                                                    "supervisorJoin",
+                                                    projectID));
+                                        }
+                                    }
+                                });
                                 updateProject();
                                 updateUser();
                             }

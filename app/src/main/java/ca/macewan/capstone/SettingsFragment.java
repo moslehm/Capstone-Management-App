@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,14 +16,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -138,7 +129,7 @@ public class SettingsFragment extends Fragment {
                                 }
                                 String token = task.getResult();
                                 NotifClient notifier = new NotifClient();
-                                notifier.tokenThread(notifier.payloadConstructor("Title", "Body", "projectChange", null));
+                                notifier.payloadThread(notifier.payloadConstructor("Title", "Body", "projectChange", null));
                             }
                         });
             }
