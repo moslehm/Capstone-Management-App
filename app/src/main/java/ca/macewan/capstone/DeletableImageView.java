@@ -55,7 +55,6 @@ public class DeletableImageView extends LinearLayout {
         View cardViewDelete = findViewById(R.id.cardViewDelete);
         ViewGroup.MarginLayoutParams p = (ConstraintLayout.MarginLayoutParams) cardViewDelete.getLayoutParams();
         p.setMarginEnd(clearButtonDistance);
-//        p.setMargins(0, clearButtonDistance, 0, 0);
         cardViewDelete.requestLayout();
 
         mButton = (ImageButton) findViewById(R.id.delete_button);

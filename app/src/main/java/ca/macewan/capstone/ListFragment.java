@@ -1,6 +1,5 @@
 package ca.macewan.capstone;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,23 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -237,23 +226,6 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
         if (settingUp) {
             setUp();
         } else {
-//            OnUpdateListener onUpdateListener = ;
-//                    if (recyclerAdapter == null) {
-//                        if (projectIds.size() != 0) {
-//                            textViewEmpty.setVisibility(View.GONE);
-//                            createAdapter(projectIds);
-//                        } else {
-//                            textViewEmpty.setVisibility(View.VISIBLE);
-//                            progressBar.setVisibility(View.GONE);
-//                        }
-//                        return;
-//                    }
-//                    recyclerAdapter.updateList(projectIds, new EventCompleteListener() {
-//                        @Override
-//                        public void onComplete() {
-//                        }
-//                    });
-
             onListListener.onListUpdate(screenType, new OnUpdateListener() {
                 @Override
                 public void onUpdateComplete(ArrayList<String> projectIds) {
@@ -271,7 +243,6 @@ public class ListFragment extends Fragment implements RecyclerAdapterV2.OnProjec
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (recyclerAdapter != null && hidden) {
-            // TODO: make search lose focus and maybe clear it?
             recyclerAdapter.search("");
         }
         if (!hidden){

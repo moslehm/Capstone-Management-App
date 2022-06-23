@@ -279,9 +279,7 @@ public class ProposalCreationActivity extends AppCompatActivity {
                                     } else if (Boolean.TRUE.equals(supervisor.availability.get(selectedSemester))) {
                                         arrayListSupervisors.add(supervisor);
                                     }
-//                                    continue;
                                 }
-//                                arrayListSupervisors.add(supervisor);
                             }
                             populateAlertDialog();
                         }
